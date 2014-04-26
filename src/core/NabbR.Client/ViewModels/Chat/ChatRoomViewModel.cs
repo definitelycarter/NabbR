@@ -23,12 +23,6 @@ namespace NabbR.ViewModels.Chat
             this.jabbrContext = jabbrContext;
         }
 
-        /// <summary>
-        /// Gets the room.
-        /// </summary>
-        /// <value>
-        /// The room.
-        /// </value>
         public RoomViewModel Room
         {
             get { return this.room; }

@@ -3,6 +3,7 @@
                     xmlns:local="clr-namespace:NabbR.Controls">
 
     <Style TargetType="{x:Type local:ChatMessagesControl}">
+        <!--
         <Setter Property="ScrollViewer.CanContentScroll" Value="True" />
         <Setter Property="VirtualizingPanel.IsVirtualizing" Value="True" />
         <Setter Property="VirtualizingPanel.VirtualizationMode" Value="Recycling" />
@@ -13,6 +14,7 @@
                 </ItemsPanelTemplate>
             </Setter.Value>
         </Setter>
+        -->
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:ChatMessagesControl}">

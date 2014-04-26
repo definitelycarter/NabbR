@@ -1,6 +1,6 @@
 ﻿using NabbR.ViewModels.Chat;
 using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 
 namespace NabbR.Services
@@ -20,7 +20,7 @@ namespace NabbR.Services
         /// <value>
         /// The rooms.
         /// </value>
-        IEnumerable<RoomViewModel> Rooms { get; }
+        ObservableCollection<RoomViewModel> Rooms { get; }
         /// <summary>
         /// Logs in the user.
         /// </summary>

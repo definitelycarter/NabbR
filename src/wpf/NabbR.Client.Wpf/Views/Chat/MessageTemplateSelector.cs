@@ -39,14 +39,17 @@ namespace NabbR.Views.Chat
         /// </returns>
         public override DataTemplate SelectTemplate(Object item, DependencyObject container)
         {
-            MessageViewModel vm = item as MessageViewModel;
-            if (vm != null)
+            Type messageType = item.GetType();
+
+            if (messageType == typeof(UserMessageViewModel))
             {
-                if (!vm.HtmlEncoded)
-                {
-                    return ChatRoomMessageTemplate;
-                }
+                return this.ChatRoomMessageTemplate;
             }
+            else if (messageType == typeof(MessageViewModel))
+            {
+                return NotificationTemplate;
+            }
+
             return base.SelectTemplate(item, container);
         }
     }

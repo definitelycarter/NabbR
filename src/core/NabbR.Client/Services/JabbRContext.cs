@@ -17,7 +17,6 @@ namespace NabbR.Services
         private readonly IJabbRClient jabbrClient;
         private readonly IEventAggregator eventAggregator;
         private readonly SynchronizationContext _synchronizationContext = SynchronizationContext.Current;
-        private readonly ObservableCollection<UserViewModel> users = new ObservableCollection<UserViewModel>();
         private readonly ObservableCollection<RoomViewModel> rooms = new ObservableCollection<RoomViewModel>();
         /// <summary>
         /// Initializes a new instance of the <see cref="JabbRContext"/> class.
@@ -37,14 +36,6 @@ namespace NabbR.Services
 
             this.jabbrClient = jabbrClient;
             this.eventAggregator = eventAggregator;
-
-            this.jabbrClient.JoinedRoom += OnRoomJoined;
-            this.jabbrClient.MessageReceived += OnMessageReceived;
-            this.jabbrClient.UserActivityChanged += OnUserActivityChanged;
-            this.jabbrClient.UsersInactive += OnUsersInactive;
-            this.jabbrClient.UserTyping += OnUserTypingChanged;
-            this.jabbrClient.UserLeft += OnUserLeftRoom;
-            this.jabbrClient.UserJoined += OnUserJoinedRoom;
         }
 
         /// <summary>
@@ -60,7 +51,7 @@ namespace NabbR.Services
         /// <value>
         /// The rooms.
         /// </value>
-        IEnumerable<RoomViewModel> IJabbRContext.Rooms
+        ObservableCollection<RoomViewModel> IJabbRContext.Rooms
         {
             get { return this.rooms; }
         }
@@ -79,6 +70,15 @@ namespace NabbR.Services
 
                 var roomInfoTasks = info.Rooms.Select(r => this.HandleRoomJoined(r));
                 await Task.WhenAll(roomInfoTasks);
+
+                this.jabbrClient.JoinedRoom += OnRoomJoined;
+                this.jabbrClient.MessageReceived += OnMessageReceived;
+                this.jabbrClient.UserActivityChanged += OnUserActivityChanged;
+                this.jabbrClient.UsersInactive += OnUsersInactive;
+                this.jabbrClient.UserTyping += OnUserTypingChanged;
+                this.jabbrClient.UserLeft += OnUserLeftRoom;
+                this.jabbrClient.UserJoined += OnUserJoinedRoom;
+
                 return true;
             }
             catch (Exception)
@@ -108,16 +108,18 @@ namespace NabbR.Services
         {
             _synchronizationContext.InvokeIfRequired(() =>
                 {
-                    UserViewModel userVm = this.users.FirstOrDefault(u => u.Name == user.Name);
+                    foreach (var room in this.rooms)
+                    {
+                        UserViewModel userVm = room.Users.FirstOrDefault(u => u.Name == user.Name);
 
-                    if (userVm == null)
-                    {
-                        userVm = user.AsViewModel();
-                        this.users.Add(userVm);
-                    }
-                    else
-                    {
-                        userVm.Status = user.Status;
+                        if (userVm != null)
+                        {
+                            if (userVm.Status != user.Status)
+                            {
+                                userVm.Status = user.Status;
+                                room.AddNotification(String.Format("{0} has become {1}.", user.Name, userVm.Status));
+                            }
+                        }
                     }
                 });
         }
@@ -129,16 +131,7 @@ namespace NabbR.Services
 
                     if (roomVm != null)
                     {
-                        UserViewModel userVm = this.users.FirstOrDefault(u => u.Name == user.Name);
-
-                        if (userVm == null)
-                        {
-                            userVm = user.AsViewModel();
-                            this.users.Add(userVm);
-                        }
-
-                        ChatUserViewModel chatUser = new ChatUserViewModel(userVm);
-                        roomVm.Users.Add(chatUser);
+                        this.HandleUserJoiningRoom(roomVm, user);
                     }
                 });
         }
@@ -150,11 +143,12 @@ namespace NabbR.Services
 
                 if (roomVm != null)
                 {
-                    ChatUserViewModel userLeaving = roomVm.Users.FirstOrDefault(u => u.User.Name == user.Name);
+                    UserViewModel userLeaving = roomVm.Users.FirstOrDefault(u => u.Name == user.Name);
 
                     if (userLeaving != null)
                     {
-                        roomVm.Users.Remove(userLeaving);
+                        userLeaving.Status = UserStatus.Offline;
+                        roomVm.AddNotification(String.Format("{0} has left {1}.", userLeaving.Name, roomVm.Name));
                     }
                 }
             });
@@ -164,10 +158,11 @@ namespace NabbR.Services
             _synchronizationContext.InvokeIfRequired(() =>
             {
                 RoomViewModel roomVm = this.rooms.FirstOrDefault(r => r.Name == roomName);
-                if (roomVm != null)
+                UserViewModel userVm = roomVm.Users.FirstOrDefault(u => u.Name == user.Name);
+
+                if (userVm != null)
                 {
-                    ChatUserViewModel chatUser = roomVm.Users.FirstOrDefault(u => u.User.Name == user.Name);
-                    chatUser.IsTyping = true;
+                    userVm.IsTyping = true;
                 }
             });
         }
@@ -184,45 +179,55 @@ namespace NabbR.Services
                 });
         }
 
-        private async Task HandleRoomJoined(Room roomInfo)
+        private Task HandleRoomJoined(Room roomInfo)
         {
-            var room = await this.jabbrClient.GetRoomInfo(roomInfo.Name);
-            RoomViewModel roomVm = room.AsViewModel();
-
-            foreach (var user in room.Users)
-            {
-                UserViewModel userVm = this.users.FirstOrDefault(u => u.Name == user.Name);
-
-                if (userVm == null)
+            return this.jabbrClient.GetRoomInfo(roomInfo.Name)
+                .ContinueWith(t =>
                 {
-                    userVm = user.AsViewModel();
-                    this.users.Add(userVm);
-                }
+                    _synchronizationContext.InvokeIfRequired(() =>
+                        {
+                            var room = t.Result;
+                            RoomViewModel roomVm = room.AsViewModel();
 
-                ChatUserViewModel chatUser = new ChatUserViewModel(userVm);
-                roomVm.Users.Add(chatUser);
-            }
+                            foreach (var user in room.Users)
+                            {
+                                this.HandleUserJoiningRoom(roomVm, user);
+                            }
 
-            foreach (var message in room.RecentMessages)
-            {
-                this.HandleMessageReceived(message, roomVm);
-            }
+                            foreach (var message in room.RecentMessages)
+                            {
+                                this.HandleMessageReceived(message, roomVm);
+                            }
 
-            this.rooms.Add(roomVm);
-            this.eventAggregator.Publish(new JoinedRoom { Room = roomVm });
-
+                            this.rooms.Add(roomVm);
+                        });
+                }, TaskContinuationOptions.OnlyOnRanToCompletion);
         }
         private void HandleMessageReceived(Message message, RoomViewModel room)
         {
-            UserViewModel userVm = this.users.FirstOrDefault(u => u.Name == message.User.Name);
+            UserViewModel userVm = room.Users.FirstOrDefault(u => u.Name == message.User.Name);
             if (userVm == null)
             {
                 userVm = message.User.AsViewModel();
-                this.users.Add(userVm);
+                userVm.Status = UserStatus.Offline;
+                room.Users.Add(userVm);
             }
 
-            MessageViewModel messageVm = new MessageViewModel(userVm, message);
+            MessageViewModel messageVm = new UserMessageViewModel(message, userVm);
             room.Messages.Add(messageVm);
+        }
+        private void HandleUserJoiningRoom(RoomViewModel room, User user)
+        {
+            UserViewModel userVm = room.Users.FirstOrDefault(u => u.Name == user.Name);
+            if (userVm == null)
+            {
+                userVm = user.AsViewModel();
+                room.Users.Add(userVm);
+            }
+            else
+            {
+                userVm.Status = user.Status;
+            }
         }
     }
 

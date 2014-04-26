@@ -7,6 +7,8 @@ namespace NabbR.ViewModels.Chat
     {
         private String name;
         private String hash;
+        private String note;
+        private Boolean isTyping;
         private UserStatus userStatus;
 
         public String Name
@@ -24,6 +26,18 @@ namespace NabbR.ViewModels.Chat
         {
             get { return this.userStatus; }
             set { this.Set(ref this.userStatus, value); }
+        }
+
+        public Boolean IsTyping
+        {
+            get { return this.isTyping; }
+            set { this.Set(ref this.isTyping, value); }
+        }
+
+        public String Note
+        {
+            get { return this.note; }
+            set { this.Set(ref this.note, value); }
         }
     }
 }

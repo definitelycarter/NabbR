@@ -6,8 +6,6 @@ namespace NabbR.ViewModels.Chat
 {
     public class MessageViewModel : ViewModelBase
     {
-        private readonly UserViewModel user;
-
         private readonly String content;
         private readonly Boolean isHtmlEncoded;
         private readonly DateTimeOffset messageDateTime;
@@ -15,9 +13,8 @@ namespace NabbR.ViewModels.Chat
         /// Initializes a new instance of the <see cref="MessageViewModel"/> class.
         /// </summary>
         /// <param name="message">The message.</param>
-        public MessageViewModel(UserViewModel user, Message message)
+        public MessageViewModel(Message message)
         {
-            this.user = user;
             this.content = message.Content;
             this.messageDateTime = message.When;
             this.isHtmlEncoded = message.HtmlEncoded;
@@ -30,11 +27,7 @@ namespace NabbR.ViewModels.Chat
         /// </value>
         public String Content
         {
-            get {return this.content; }
-        }
-        public UserViewModel User
-        {
-            get { return this.user; }
+            get { return this.content; }
         }
         /// <summary>
         /// Gets the message date time.

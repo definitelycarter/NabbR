@@ -9,6 +9,7 @@
              xmlns:tmpl="clr-namespace:NabbR.Views.Chat.Templates"
              xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
              xmlns:controls="clr-namespace:NabbR.Controls"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d" d:DesignWidth="1000">
 
     <UserControl.Resources>
@@ -16,6 +17,7 @@
             <chat:MessageTemplateSelector.NotificationTemplate>
                 <DataTemplate>
                     <Grid>
+                        <Label Content="{Binding Path=Content}" />
                     </Grid>
                 </DataTemplate>
             </chat:MessageTemplateSelector.NotificationTemplate>
@@ -36,10 +38,15 @@
         <Grid.Resources>
             <CollectionViewSource x:Key="UsersCollectionViewSource"
                                   IsLiveSortingRequested="True"
-                                  Source="{Binding Path=Room.Users}">
+                                  IsLiveFilteringRequested="True"
+                                  Source="{Binding Path=Room.Users}"
+                                  Filter="UserFilter">
+                <CollectionViewSource.LiveFilteringProperties>
+                    <sys:String>Status</sys:String>
+                </CollectionViewSource.LiveFilteringProperties>
                 <CollectionViewSource.SortDescriptions>
-                    <scm:SortDescription PropertyName="User.Status" />
-                    <scm:SortDescription PropertyName="User.Name" />
+                    <scm:SortDescription PropertyName="Status" />
+                    <scm:SortDescription PropertyName="Name" />
                 </CollectionViewSource.SortDescriptions>
             </CollectionViewSource>
         </Grid.Resources>
@@ -64,7 +71,7 @@
                     </Grid.RowDefinitions>
 
                     <Grid Grid.Row="0">
-                        <controls:ChatMessagesControl ItemsSource="{Binding Path=Room.Messages}">
+                        <controls:ChatMessagesControl ItemsSource="{Binding Path=Room.Messages, IsAsync=True}">
                             <controls:ChatMessagesControl.ItemTemplate>
                                 <DataTemplate>
                                     <Border Margin="5,0,5,2">
@@ -108,7 +115,7 @@
                                             <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
 
-                                        <tmpl:UserTemplate DataContext="{Binding Path=User}" Grid.Column="0" Margin="5,0,5,2" />
+                                        <tmpl:UserTemplate Grid.Column="0" Margin="5,0,5,2" />
                                     </Grid>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>

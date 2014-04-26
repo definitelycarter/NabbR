@@ -10,7 +10,7 @@ namespace NabbR.ViewModels.Chat
     {
         private String name;
         private String topic;
-        private readonly ObservableCollection<ChatUserViewModel> users;
+        private readonly ObservableCollection<UserViewModel> users;
         private readonly ObservableCollection<MessageViewModel> messages;
 
         /// <summary>
@@ -18,7 +18,7 @@ namespace NabbR.ViewModels.Chat
         /// </summary>
         public RoomViewModel()
         {
-            this.users = new ObservableCollection<ChatUserViewModel>();
+            this.users = new ObservableCollection<UserViewModel>();
             this.messages = new ObservableCollection<MessageViewModel>();
         }
         /// <summary>
@@ -57,9 +57,15 @@ namespace NabbR.ViewModels.Chat
         {
             get { return this.messages; }
         }
-        public ObservableCollection<ChatUserViewModel> Users
+        public ObservableCollection<UserViewModel> Users
         {
             get { return this.users; }
+        }
+
+        public void AddNotification(String notificationMessage)
+        {
+            Message message = new Message { Content = notificationMessage, When = DateTime.Now };
+            this.Messages.Add(new MessageViewModel(message));
         }
     }
 }

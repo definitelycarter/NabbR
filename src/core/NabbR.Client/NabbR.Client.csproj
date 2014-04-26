@@ -44,9 +44,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\IJabbRContext.cs" />
     <Compile Include="ViewModels\Chat\ChatRoomViewModel.cs" />
-    <Compile Include="ViewModels\Chat\ChatUserViewModel.cs" />
     <Compile Include="ViewModels\Chat\MessageViewModel.cs" />
     <Compile Include="ViewModels\Chat\RoomViewModel.cs" />
+    <Compile Include="ViewModels\Chat\UserMessageViewModel.cs" />
     <Compile Include="ViewModels\Chat\UserViewModel.cs" />
     <Compile Include="ViewModels\LoginViewModel.cs" />
     <Compile Include="ViewModels\ShellViewModel.cs" />

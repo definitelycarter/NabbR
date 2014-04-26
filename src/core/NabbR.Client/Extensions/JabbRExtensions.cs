@@ -20,7 +20,8 @@ namespace NabbR
             {
                 Name = user.Name,
                 Hash = user.Hash,
-                
+                Note = user.Note,
+                Status = user.Status,
             };
         }
     }

@@ -12,7 +12,7 @@ namespace NabbR.Converters
             String hash = value as String;
             String size = parameter as String;
 
-            String relativeUri = String.Format("avatar/{0}?s={1}", hash, size);
+            String relativeUri = String.Format("avatar/{0}?s={1}&d=mm", hash, size);
 
             return new Uri(gravitarUri, relativeUri);
         }

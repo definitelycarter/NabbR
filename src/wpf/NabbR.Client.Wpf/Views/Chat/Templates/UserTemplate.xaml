@@ -9,9 +9,9 @@
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
-        <StackPanel Grid.Column="0" Orientation="Horizontal" Height="16" VerticalAlignment="Top">
+        <StackPanel Grid.Column="0" Orientation="Horizontal" Height="24" VerticalAlignment="Top" ToolTip="{Binding Path=Note}">
             <Border Width="5" Background="{Binding Path=Status, Converter={StaticResource userStatusToBrushConverter}}" />
-            <Image Source="{Binding Path=Hash, Converter={StaticResource hashToGravatarImageConverter}, ConverterParameter=16, IsAsync=True}" Width="16" />
+            <Image Source="{Binding Path=Hash, Converter={StaticResource hashToGravatarImageConverter}, ConverterParameter=24, IsAsync=True}" Width="24" />
         </StackPanel>
         <Label Grid.Column="1" Content="{Binding Path=Name}" Margin="10,2" />
     </Grid>

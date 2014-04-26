@@ -1,4 +1,5 @@
-﻿using NabbR.ViewModels;
+﻿using JabbR.Client.Models;
+using NabbR.ViewModels;
 using NabbR.ViewModels.Chat;
 using System;
 using System.ComponentModel;
@@ -17,6 +18,16 @@ namespace NabbR.Views.Chat
         {
             InitializeComponent();
             this.DataContextChanged += OnDataContextChanged;
+        }
+
+        private void UserFilter(object sender, FilterEventArgs e)
+        {
+            UserViewModel userViewModel = (UserViewModel)e.Item;
+            
+            if (userViewModel.Status == UserStatus.Offline)
+            {
+                e.Accepted = false;
+            }
         }
 
         private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)

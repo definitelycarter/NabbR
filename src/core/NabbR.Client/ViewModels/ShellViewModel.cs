@@ -7,24 +7,21 @@ using System.Collections.ObjectModel;
 
 namespace NabbR.ViewModels
 {
-    public class ShellViewModel : ViewModelBase, INavigationAware, IHandle<JoinedRoom>
+    public class ShellViewModel : ViewModelBase, INavigationAware
     {
+        private readonly IJabbRContext jabbrContext;
         private readonly IDialogService dialogService;
-        private readonly ObservableCollection<RoomViewModel> rooms;
 
-        public ShellViewModel(IDialogService dialogService,
-                              IEventAggregator eventAggregator)
+        public ShellViewModel(IJabbRContext jabbrContext,
+                              IDialogService dialogService)
         {
+            this.jabbrContext = jabbrContext;
             this.dialogService = dialogService;
-            this.rooms = new ObservableCollection<RoomViewModel>();
-
-            eventAggregator.Subscribe(this);
         }
-
 
         public ObservableCollection<RoomViewModel> Rooms
         {
-            get { return this.rooms; }
+            get { return this.jabbrContext.Rooms; }
         }
 
         void INavigationAware.Navigated(IDictionary<String, String> parameters)
@@ -35,11 +32,6 @@ namespace NabbR.ViewModels
                     
                 }
             );
-        }
-
-        void IHandle<JoinedRoom>.Handle(JoinedRoom message)
-        {
-            this.Rooms.Add(message.Room);
         }
     }
 }
