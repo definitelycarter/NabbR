@@ -85,7 +85,6 @@
     </Compile>
     <Compile Include="Controls\ChatMessagesControl.cs" />
     <Compile Include="Converters\UserStatusToBrushConverter.cs" />
-    <Compile Include="Extensions\DependencyObjectExtensions.cs" />
     <Compile Include="Helpers\DialogHelper.cs" />
     <Compile Include="Helpers\PasswordHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
