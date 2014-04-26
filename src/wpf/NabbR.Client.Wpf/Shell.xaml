@@ -1,0 +1,9 @@
+﻿<mui:ModernWindow x:Class="NabbR.Client.Shell" x:ClassModifier="internal"
+                  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                  xmlns:mui="http://firstfloorsoftware.com/ModernUI">
+    <mui:ModernWindow.MenuLinkGroups>
+        <mui:LinkGroup x:Name="chatGroup" DisplayName="Chat">
+        </mui:LinkGroup>
+    </mui:ModernWindow.MenuLinkGroups>
+</mui:ModernWindow>

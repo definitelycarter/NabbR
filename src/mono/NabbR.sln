@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NabbR.Client", "..\core\NabbR.Client\NabbR.Client.csproj", "{94AC2E35-759C-4BFF-BD21-628B5ED91E31}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NabbR.Core", "..\core\NabbR.Core\NabbR.Core.csproj", "{728CDE20-0477-404A-9DD3-7514FB722E98}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{728CDE20-0477-404A-9DD3-7514FB722E98}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{728CDE20-0477-404A-9DD3-7514FB722E98}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{728CDE20-0477-404A-9DD3-7514FB722E98}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{728CDE20-0477-404A-9DD3-7514FB722E98}.Release|Any CPU.Build.0 = Release|Any CPU
+		{94AC2E35-759C-4BFF-BD21-628B5ED91E31}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{94AC2E35-759C-4BFF-BD21-628B5ED91E31}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{94AC2E35-759C-4BFF-BD21-628B5ED91E31}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{94AC2E35-759C-4BFF-BD21-628B5ED91E31}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = ..\core\NabbR.Client\NabbR.Client.csproj
+	EndGlobalSection
+EndGlobal

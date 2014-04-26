@@ -1,0 +1,121 @@
+﻿<UserControl x:Class="NabbR.Views.Chat.ChatRoomView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mui="http://firstfloorsoftware.com/ModernUI"
+             xmlns:vm="clr-namespace:NabbR.ViewModels.Chat;assembly=NabbR.Client"
+             xmlns:chat="clr-namespace:NabbR.Views.Chat"
+             xmlns:tmpl="clr-namespace:NabbR.Views.Chat.Templates"
+             xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
+             xmlns:controls="clr-namespace:NabbR.Controls"
+             mc:Ignorable="d" d:DesignWidth="1000">
+
+    <UserControl.Resources>
+        <chat:MessageTemplateSelector x:Key="messageTemplateSelector">
+            <chat:MessageTemplateSelector.NotificationTemplate>
+                <DataTemplate>
+                    <Grid>
+                    </Grid>
+                </DataTemplate>
+            </chat:MessageTemplateSelector.NotificationTemplate>
+            <chat:MessageTemplateSelector.DirectMessageTemplate>
+                <DataTemplate>
+                    <Grid>
+                    </Grid>
+                </DataTemplate>
+            </chat:MessageTemplateSelector.DirectMessageTemplate>
+            <chat:MessageTemplateSelector.ChatRoomMessageTemplate>
+                <DataTemplate>
+                    <tmpl:ChatMessageTemplate />
+                </DataTemplate>
+            </chat:MessageTemplateSelector.ChatRoomMessageTemplate>
+        </chat:MessageTemplateSelector>
+    </UserControl.Resources>
+    <Grid d:DataContext="{d:DesignInstance Type=vm:ChatRoomViewModel}">
+        <Grid.Resources>
+            <CollectionViewSource x:Key="UsersCollectionViewSource"
+                                  IsLiveSortingRequested="True"
+                                  Source="{Binding Path=Room.Users}">
+                <CollectionViewSource.SortDescriptions>
+                    <scm:SortDescription PropertyName="User.Status" />
+                    <scm:SortDescription PropertyName="User.Name" />
+                </CollectionViewSource.SortDescriptions>
+            </CollectionViewSource>
+        </Grid.Resources>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0">
+            <TextBlock Style="{StaticResource Heading2}" Text="{Binding Path=Room.Topic}" />
+        </Grid>
+        <Border Grid.Row="1" BorderThickness="1" BorderBrush="{StaticResource InputBorder}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Grid Grid.Column="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0">
+                        <controls:ChatMessagesControl ItemsSource="{Binding Path=Room.Messages}">
+                            <controls:ChatMessagesControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Margin="5,0,5,2">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition />
+                                                <ColumnDefinition Width="160" />
+                                            </Grid.ColumnDefinitions>
+                                            <ContentControl Grid.Column="0"
+                                                Content="{Binding}"
+                                                HorizontalAlignment="Stretch"
+                                                HorizontalContentAlignment="Stretch"
+                                                ContentTemplateSelector="{StaticResource messageTemplateSelector}" />
+                                            <TextBlock Grid.Column="1" HorizontalAlignment="Right" Text="{Binding Path=MessageDateTime, StringFormat=\{0:h:mm:ss tt\}}" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </controls:ChatMessagesControl.ItemTemplate>
+                        </controls:ChatMessagesControl>
+                    </Grid>
+
+                    <Grid Grid.Row="1">
+                        <Grid Margin="0,5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBox Margin="5,0" Text="{Binding Path=MessageToSend, UpdateSourceTrigger=PropertyChanged}" KeyUp="TextBox_KeyUp" />
+                            <Button Grid.Column="1" Content="Send" Command="{Binding Path=SendMessageCommand}" />
+                        </Grid>
+                    </Grid>
+                </Grid>
+                <Grid Grid.Column="1">
+                    <ScrollViewer>
+                        <ItemsControl ItemsSource="{Binding Source={StaticResource UsersCollectionViewSource}}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <tmpl:UserTemplate DataContext="{Binding Path=User}" Grid.Column="0" Margin="5,0,5,2" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Grid>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

@@ -1,0 +1,17 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:mui="http://firstfloorsoftware.com/ModernUI"
+                    xmlns:converters="clr-namespace:NabbR.Converters"
+                    xmlns:corevm="clr-namespace:NabbR.ViewModels;assembly=NabbR.Core">
+
+    <converters:UserStatusToBrushConverter x:Key="userStatusToBrushConverter" ActiveBrush="#77d42a" InactiveBrush="#fa2" OfflineBrush="Transparent" />
+    <converters:HashToGravatarImageConverter x:Key="hashToGravatarImageConverter" />
+    
+    <DataTemplate x:Key="DialogButtonTemplate" DataType="{x:Type corevm:CommandViewModel}">
+        <Button Margin="2,0,0,0"
+			    Content="{Binding Caption, Mode=OneTime}"
+			    Command="{Binding Command, Mode=OneTime}"
+			    IsDefault="{Binding IsDefault, Mode=OneTime}" />
+    </DataTemplate>
+
+</ResourceDictionary>
