@@ -1,7 +1,7 @@
 language: objective-c
 before_install:
  # Make sure mono is installed,
- - wget http://origin-download.mono-project.com/archive/3.4.0/macos-10-x86/MonoFramework-MDK-3.4.0.macos10.xamarin.x86.pkg
+  - wget http://origin-download.mono-project.com/archive/3.4.0/macos-10-x86/MonoFramework-MDK-3.4.0.macos10.xamarin.x86.pkg
   - sudo installer -pkg "MonoFramework-MDK-3.4.0.macos10.xamarin.x86.pkg" -target /
 env:
   - EnableNuGetPackageRestore=true
