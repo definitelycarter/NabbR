@@ -11,27 +11,16 @@ namespace NabbR.Services
 {
     class NinjectContentLoader : DefaultContentLoader
     {
-        private readonly IServiceLocator serviceLocator;
-        private readonly IEnumerable<Assembly> assemblies;
-        private readonly IDictionary<String, Type> registeredViews;
-
+        private IDependencyResolver resolver;
+        private readonly ViewLocater viewLocater;
         /// <summary>
         /// Creates a new instance of a <see cref="NinjectContentLoader"/>.
         /// </summary>
-        /// <param name="serviceLocator">The service locator.</param>
-        /// <param name="assemblies">The registered assemblies.</param>
-        public NinjectContentLoader(IServiceLocator serviceLocator, IEnumerable<Assembly> assemblies)
+        public NinjectContentLoader(ViewLocater viewLocater,
+                                    IDependencyResolver resolver)
         {
-            this.serviceLocator = serviceLocator;
-            this.assemblies = assemblies;
-
-            IEnumerable<Type> types = assemblies.SelectMany(a => a.DefinedTypes).ToArray();
-
-            this.registeredViews = (from viewType in types
-                                    let viewAttribute = viewType.GetCustomAttribute<ViewAttribute>()
-                                    where viewAttribute != null
-                                    select new { viewAttribute.Uri, ViewType = viewType })
-                                    .ToDictionary(a => a.Uri, a => a.ViewType);
+            this.viewLocater = viewLocater;
+            this.resolver = resolver;
         }
         /// <summary>
         /// Loads the content from specified uri.
@@ -43,21 +32,20 @@ namespace NabbR.Services
         protected override Object LoadContent(Uri uri)
         {
             FrameworkElement view = null;
-            var pathAndQuery = this.GetPathAndQueryParameters(uri);
 
-            Type viewType = this.registeredViews
-                .Where(kv => kv.Key.Equals(pathAndQuery.Item1, StringComparison.InvariantCultureIgnoreCase))
-                .Select(kv => kv.Value)
-                .FirstOrDefault();
-
-            if (viewType != null)
+            var viewInfo = this.viewLocater.LocateViewInfo(uri);
+            
+            if (viewInfo != null)
             {
-                view = (FrameworkElement)this.serviceLocator.Get(viewType);
-                
-                ViewModelAttribute viewModelAttribute = viewType.GetCustomAttribute<ViewModelAttribute>();
-                if (viewModelAttribute != null)
+                var viewType = viewInfo.Item1;
+                var viewModelType = viewInfo.Item2;
+                var navigationParameters = viewInfo.Item3;
+
+                view = (FrameworkElement)this.resolver.Get(viewType); // get the view.
+
+                if (viewModelType != null)
                 {
-                    Object viewModel = this.serviceLocator.Get(viewModelAttribute.ViewModelType);
+                    Object viewModel = this.resolver.Get(viewModelType);
                     
                     INavigationAware navigationAware = viewModel as INavigationAware;
 
@@ -66,7 +54,7 @@ namespace NabbR.Services
                         RoutedEventHandler handler = null;
                         handler = (o, e) =>
                             {
-                                navigationAware.Navigated(pathAndQuery.Item2);
+                                navigationAware.Navigated(navigationParameters);
                                 view.Loaded -= handler;
                             };
 
@@ -78,37 +66,5 @@ namespace NabbR.Services
             return view;
         }
 
-        private Tuple<String, IDictionary<String, String>> GetPathAndQueryParameters(Uri uri)
-        {
-            String path = null;
-            IDictionary<String, String> query = new Dictionary<String, String>();
-            Int32 queryDelimeter = uri.OriginalString.IndexOf('?');
-
-            if (queryDelimeter > -1)
-            {
-                path = uri.OriginalString.Substring(0, queryDelimeter);
-                var parts = uri.OriginalString.Substring(queryDelimeter + 1).Split('&');
-
-                foreach (String part in parts)
-                {
-                    Int32 parameterDelimiter = part.IndexOf('=');
-                    if (parameterDelimiter == -1)
-                    {
-                        throw new InvalidOperationException("The query parameters are invalid.");
-                    }
-
-                    String parameterName = part.Substring(0, parameterDelimiter);
-                    String parameterValue = part.Substring(parameterDelimiter + 1);
-                    query.Add(parameterName, parameterValue);
-                }
-            }
-            else
-            {
-                path = uri.OriginalString;
-                
-            }
-
-            return Tuple.Create(path, query);
-        }
     }
 }

@@ -1,23 +1,20 @@
-﻿using FirstFloor.ModernUI.Windows;
-using JabbR.Client;
-using NabbR.Events;
+﻿using JabbR.Client;
 using NabbR.Services;
 using NabbR.ViewModels;
-using NabbR.ViewModels.Chat;
 using NabbR.Views;
 using Ninject;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace NabbR.Client
+namespace NabbR
 {
     partial class App
     {
-        IDependencyResolver resolver = null;
+        private IDependencyResolver resolver = null;
         private readonly IEnumerable<Assembly> assemblies = new[] {
-            typeof(App).Assembly,
-            typeof(ShellViewModel).Assembly,
-            typeof(IDependencyResolver).Assembly,
+            typeof(App).GetTypeInfo().Assembly,
+            typeof(ShellViewModel).GetTypeInfo().Assembly,
+            typeof(IDependencyResolver).GetTypeInfo().Assembly,
         };
 
         private void Initialize()
@@ -30,14 +27,14 @@ namespace NabbR.Client
             var viewLocater = new ViewLocater(resolver, assemblies);
             kernel.Bind<ViewLocater>().ToMethod(_ => viewLocater);
 
-            var contentLoader = new NinjectContentLoader(viewLocater, resolver);
-            kernel.Bind<IContentLoader>().ToMethod(_ => contentLoader);
-
             var jabbrClient = new JabbRClient("https://jabbr.net/"); // todo get the url from configuration.
             kernel.Bind<IJabbRClient>().ToMethod(_ => jabbrClient);
 
             kernel.Bind<IJabbRContext>().To<JabbRContext>().InSingletonScope();
-            kernel.Bind<IDialogService>().To<WpfDialogService>();
+            kernel.Bind<DefaultContentLoader>().ToSelf().InSingletonScope();
+            
+            kernel.Bind<Shell>().ToSelf().InSingletonScope();
+            kernel.Bind<IDialogService>().To<DialogService>();
         }
     }
 }

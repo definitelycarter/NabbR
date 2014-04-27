@@ -15,10 +15,10 @@ namespace NabbR.Services
     class WpfDialogService : IDialogService
     {
         private readonly IContentLoader contentLoader;
-        private readonly IServiceLocator serviceLocator;
+        private readonly IDependencyResolver serviceLocator;
 
         public WpfDialogService(IContentLoader contentLoader, 
-                                IServiceLocator serviceLocator)
+                                IDependencyResolver serviceLocator)
         {
             if (contentLoader == null) throw new ArgumentNullException("contentLoader");
             if (serviceLocator == null) throw new ArgumentNullException("serviceLocator");

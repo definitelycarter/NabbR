@@ -12,10 +12,9 @@ using System.Threading.Tasks;
 
 namespace NabbR.Services
 {
-    public class JabbRContext : IJabbRContext, IApplicationContext
+    public class JabbRContext : IJabbRContext
     {
         private readonly IJabbRClient jabbrClient;
-        private readonly IEventAggregator eventAggregator;
         private readonly SynchronizationContext _synchronizationContext = SynchronizationContext.Current;
         private readonly ObservableCollection<RoomViewModel> rooms = new ObservableCollection<RoomViewModel>();
         /// <summary>
@@ -28,14 +27,11 @@ namespace NabbR.Services
         /// or
         /// eventAggregator
         /// </exception>
-        public JabbRContext(IJabbRClient jabbrClient,
-                            IEventAggregator eventAggregator)
+        public JabbRContext(IJabbRClient jabbrClient)
         {
             if (jabbrClient == null) throw new ArgumentNullException("jabbrClient");
-            if (eventAggregator == null) throw new ArgumentNullException("eventAggregator");
 
             this.jabbrClient = jabbrClient;
-            this.eventAggregator = eventAggregator;
         }
 
         /// <summary>
@@ -241,7 +237,7 @@ namespace NabbR.Services
             }
             else
             {
-                context.Send(o => action(), null);
+                context.Post(o => action(), null);
             }
         }
     }

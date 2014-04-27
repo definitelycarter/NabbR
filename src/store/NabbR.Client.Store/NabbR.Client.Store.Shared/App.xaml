@@ -1,0 +1,9 @@
+﻿<Application
+    x:Class="NabbR.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:NabbR">
+    <Application.Resources>
+        <x:String x:Key="AppName">Application Name</x:String>
+    </Application.Resources>
+</Application>

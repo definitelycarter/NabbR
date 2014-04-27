@@ -11,7 +11,7 @@
     <RootNamespace>NabbR</RootNamespace>
     <AssemblyName>NabbR.Core</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Profile78</TargetFrameworkProfile>
+    <TargetFrameworkProfile>Profile259</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <ProductVersion>10.0.0</ProductVersion>
@@ -46,15 +46,15 @@
     <Compile Include="Events\IEventAggregator.cs" />
     <Compile Include="Events\IHandle%28Of T%29.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Services\IApplicationContext.cs" />
     <Compile Include="Services\IDialogService.cs" />
-    <Compile Include="Services\IServiceLocator.cs" />
+    <Compile Include="Services\IDependencyResolver.cs" />
     <Compile Include="ViewModels\CommandViewModel.cs" />
     <Compile Include="ViewModels\DialogViewModel.cs" />
     <Compile Include="ViewModels\INavigationAware.cs" />
     <Compile Include="ViewModels\ViewModelAttribute.cs" />
     <Compile Include="ViewModels\ViewModelBase.cs" />
     <Compile Include="Views\ViewAttribute.cs" />
+    <Compile Include="Views\ViewLocater.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -1,17 +1,13 @@
 ﻿using Ninject;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NabbR.Services
 {
-    class NinjectServiceLocator : IServiceLocator
+    class NinjectDependencyResolver : IDependencyResolver
     {
         private readonly IKernel kernel;
 
-        public NinjectServiceLocator(IKernel kernel)
+        public NinjectDependencyResolver(IKernel kernel)
         {
             this.kernel = kernel;
         }

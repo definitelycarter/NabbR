@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace NabbR.Services
 {
-    public interface IJabbRContext : IApplicationContext
+    public interface IJabbRContext
     {
         /// <summary>
         /// Gets the user id.

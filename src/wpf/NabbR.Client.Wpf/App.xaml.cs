@@ -17,7 +17,7 @@ namespace NabbR.Client
             // create the kernel
             this.Initialize();
 
-            IContentLoader contentLoader = serviceLocator.Get<IContentLoader>();
+            IContentLoader contentLoader = resolver.Get<IContentLoader>();
             this.Resources.Add("ContentLoader", contentLoader);
 
             this.MainWindow = (Window)await contentLoader.LoadContentAsync(new Uri("/", UriKind.Relative), CancellationToken.None);
