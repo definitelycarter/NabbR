@@ -6,4 +6,5 @@ before_install:
 env:
   - EnableNuGetPackageRestore=true
 script:
-  - xbuild src/mono/NabbR.sln
+ # Ignoring build.
+ # - xbuild src/mono/NabbR.sln
