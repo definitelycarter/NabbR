@@ -30,7 +30,7 @@
     <ProductName>NabbR</ProductName>
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>index.htm</WebPage>
-    <ApplicationRevision>7</ApplicationRevision>
+    <ApplicationRevision>8</ApplicationRevision>
     <ApplicationVersion>0.1.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -115,7 +115,9 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\ChatMessage.cs" />
     <Compile Include="Controls\ChatMessagesControl.cs" />
+    <Compile Include="Controls\RoomLink.cs" />
     <Compile Include="Converters\UserStatusToBrushConverter.cs" />
     <Compile Include="Helpers\DialogHelper.cs" />
     <Compile Include="Helpers\PasswordHelper.cs" />
@@ -133,6 +135,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="Converters\HashToGravatarImageConverter.cs" />
+    <Compile Include="Security\CredentialManager.cs" />
     <Compile Include="Services\NinjectContentLoader.cs" />
     <Compile Include="Services\NinjectDependencyResolver.cs" />
     <Compile Include="Services\WpfDialogService.cs" />
@@ -146,7 +149,7 @@
       <DependentUpon>ChatMessageTemplate.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Chat\MessageTemplateSelector.cs" />
-    <Compile Include="Views\Chat\Templates\MessageContentTemplateSelector.cs" />
+    <Compile Include="Views\Chat\MessageContentTemplateSelector.cs" />
     <Compile Include="Views\Chat\Templates\UserTemplate.xaml.cs">
       <DependentUpon>UserTemplate.xaml</DependentUpon>
     </Compile>

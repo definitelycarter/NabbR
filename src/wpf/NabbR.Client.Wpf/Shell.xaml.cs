@@ -1,10 +1,11 @@
 ﻿using FirstFloor.ModernUI.Windows.Controls;
-using JabbR.Client.Models;
+using NabbR.Controls;
 using NabbR.ViewModels;
 using NabbR.ViewModels.Chat;
 using NabbR.Views;
 using System;
 using System.Collections.Specialized;
+using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 
@@ -12,7 +13,7 @@ namespace NabbR.Client
 {
     [View(Shell.Uri)]
     [ViewModel(typeof(ShellViewModel))]
-    partial class Shell
+    partial class Shell : ModernWindow
     {
         const String Uri = "/";
 
@@ -28,10 +29,14 @@ namespace NabbR.Client
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
+            ModernFrame frame = (ModernFrame)this.Template.FindName("ContentFrame", this);
 
-            ModernFrame frame = FindVisualChild<ModernFrame>(this);
             // critical to make navigation work
-            frame.KeepContentAlive = false;
+            // frame.KeepContentAlive = false;
+            frame.Navigated += (o, e) =>
+                {
+
+                };
         }
 
         private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -45,16 +50,39 @@ namespace NabbR.Client
 
         private void OnRoomsChanged(Object sender, NotifyCollectionChangedEventArgs e)
         {
-            if (e.NewItems != null)
+
+            if (e.Action == NotifyCollectionChangedAction.Add)
             {
-                this.Dispatcher.BeginInvoke(new Action(() =>
+                if (e.NewItems != null)
+                {
+                    foreach (RoomViewModel room in e.NewItems)
                     {
-                        foreach (RoomViewModel room in e.NewItems)
+                        String uri = String.Format("/chatroom?room={0}", room.Name);
+                        chatGroup.Links.Add(new RoomLink { RoomName = room.Name, DisplayName = room.Name, Source = new Uri(uri, UriKind.RelativeOrAbsolute) });
+                    }
+                }
+            }
+            else if (e.Action == NotifyCollectionChangedAction.Remove)
+            {
+                if (e.OldItems != null)
+                {
+                    foreach (RoomViewModel room in e.OldItems)
+                    {
+                        RoomLink link = this.chatGroup.Links.OfType<RoomLink>().FirstOrDefault(l => l.RoomName == room.Name);
+                        chatGroup.Links.Remove(link);
+
+                        var newLink = chatGroup.Links.FirstOrDefault();
+
+                        if (newLink != null)
                         {
-                            String uri = String.Format("/ChatRoom?room={0}", room.Name);
-                            chatGroup.Links.Add(new FirstFloor.ModernUI.Presentation.Link { DisplayName = room.Name, Source = new Uri(uri, UriKind.RelativeOrAbsolute) });
+                            this.ContentSource = newLink.Source;
                         }
-                    }));
+                    }
+                }
+            }
+            else if (e.Action == NotifyCollectionChangedAction.Reset)
+            {
+                this.chatGroup.Links.Clear();
             }
         }
 

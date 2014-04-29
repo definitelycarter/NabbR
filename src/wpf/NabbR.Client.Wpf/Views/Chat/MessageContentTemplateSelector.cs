@@ -3,7 +3,7 @@ using System;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace NabbR.Views.Chat.Templates
+namespace NabbR.Views.Chat
 {
     public class MessageContentTemplateSelector : DataTemplateSelector
     {

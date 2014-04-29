@@ -1,4 +1,5 @@
 ﻿using JabbR.Client;
+using NabbR.Security;
 using NabbR.Services;
 using NabbR.ViewModels;
 using NabbR.Views;
@@ -35,6 +36,7 @@ namespace NabbR
             
             kernel.Bind<Shell>().ToSelf().InSingletonScope();
             kernel.Bind<IDialogService>().To<DialogService>();
+            kernel.Bind<ICredentialManager>().To<CredentialManager>().InSingletonScope();
         }
     }
 }

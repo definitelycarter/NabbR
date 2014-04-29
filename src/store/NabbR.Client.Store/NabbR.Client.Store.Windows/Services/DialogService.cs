@@ -2,8 +2,8 @@
 using NabbR.ViewModels;
 using NabbR.Views;
 using System;
+using Windows.Security.Credentials.UI;
 using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
 
@@ -14,7 +14,7 @@ namespace NabbR.Services
         Popup popup;
         private readonly IDependencyResolver resolver;
         private readonly DefaultContentLoader contentLoader;
-        public DialogService(Shell shell, 
+        public DialogService(Shell shell,
                              IDependencyResolver resolver,
                              DefaultContentLoader contentLoader)
         {
@@ -29,7 +29,6 @@ namespace NabbR.Services
             T viewModel = this.resolver.Get<T>();
             this.Show(uri, viewModel, callback);
         }
-
         public void Show<T>(String uri, T viewModel, Action<T, Boolean> callback) where T : ViewModelBase
         {
             FrameworkElement view = (FrameworkElement)this.contentLoader.LoadContent(new Uri(uri, UriKind.RelativeOrAbsolute), viewModel);
@@ -55,7 +54,7 @@ namespace NabbR.Services
                 closedHandler = (o, e) =>
                     {
                         popup.Closed -= closedHandler;
-                        
+
                         popup.Child = null;
                         popup.ClearValue(Popup.IsOpenProperty);
                         callback(viewModel, dialogViewModel.DialogResult.GetValueOrDefault());

@@ -1,6 +1,7 @@
 ﻿using FirstFloor.ModernUI.Windows;
 using JabbR.Client;
 using NabbR.Events;
+using NabbR.Security;
 using NabbR.Services;
 using NabbR.ViewModels;
 using NabbR.ViewModels.Chat;
@@ -37,7 +38,9 @@ namespace NabbR.Client
             kernel.Bind<IJabbRClient>().ToMethod(_ => jabbrClient);
 
             kernel.Bind<IJabbRContext>().To<JabbRContext>().InSingletonScope();
-            kernel.Bind<IDialogService>().To<WpfDialogService>();
+            kernel.Bind<IDialogService>().To<WpfDialogService>().InSingletonScope();
+
+            kernel.Bind<ICredentialManager>().To<CredentialManager>().InSingletonScope();
         }
     }
 }

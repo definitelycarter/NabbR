@@ -80,5 +80,11 @@ namespace NabbR.Services
                 yield return button;
             }
         }
+
+
+        public void PromptForCredentials(Action<bool, string, string> callback)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

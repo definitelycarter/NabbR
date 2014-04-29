@@ -46,6 +46,8 @@
     <Compile Include="Events\IEventAggregator.cs" />
     <Compile Include="Events\IHandle%28Of T%29.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Security\CredentialResult.cs" />
+    <Compile Include="Security\ICredentialManager.cs" />
     <Compile Include="Services\IDialogService.cs" />
     <Compile Include="Services\IDependencyResolver.cs" />
     <Compile Include="ViewModels\CommandViewModel.cs" />

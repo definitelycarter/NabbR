@@ -72,16 +72,9 @@ namespace NabbR.ViewModels
             get { return this.loginCommand ?? (this.loginCommand = new DelegateCommand(this.HandleLogin, this.CanLogin)); }
         }
 
-        private async void HandleLogin()
+        private void HandleLogin()
         {
-            this.IsLoggingIn = true;
-            Boolean loggedIn = await this.jabbrContext.LoginAsync(this.Username, this.Password);
-            this.IsLoggingIn = false;
-
-            if (loggedIn)
-            {
-                this.DialogResult = true;
-            }
+            this.DialogResult = true;
         }
         private Boolean CanLogin()
         {

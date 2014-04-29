@@ -6,6 +6,7 @@ using NabbR.ViewModels.Chat;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -41,6 +42,7 @@ namespace NabbR.Services
         /// The user id.
         /// </value>
         public String UserId { get; private set; }
+        public String Username { get; private set; }
         /// <summary>
         /// Gets the rooms.
         /// </summary>
@@ -63,6 +65,9 @@ namespace NabbR.Services
             {
                 LogOnInfo info = await this.jabbrClient.Connect(username, password);
                 this.UserId = info.UserId;
+
+                var userInfo = await this.jabbrClient.GetUserInfo();
+                this.Username = userInfo.Name;
 
                 var roomInfoTasks = info.Rooms.Select(r => this.HandleRoomJoined(r));
                 await Task.WhenAll(roomInfoTasks);
@@ -143,8 +148,15 @@ namespace NabbR.Services
 
                     if (userLeaving != null)
                     {
-                        userLeaving.Status = UserStatus.Offline;
-                        roomVm.AddNotification(String.Format("{0} has left {1}.", userLeaving.Name, roomVm.Name));
+                        if (user.Name == Username)
+                        {
+                            this.rooms.Remove(roomVm);
+                        }
+                        else
+                        {
+                            userLeaving.Status = UserStatus.Offline;
+                            roomVm.AddNotification(String.Format("{0} has left {1}.", userLeaving.Name, roomVm.Name));
+                        }
                     }
                 }
             });
@@ -224,6 +236,32 @@ namespace NabbR.Services
             {
                 userVm.Status = user.Status;
             }
+        }
+
+
+        public Task<RoomViewModel> JoinRoom(String roomName)
+        {
+            TaskCompletionSource<RoomViewModel> tcs = new TaskCompletionSource<RoomViewModel>();
+
+            NotifyCollectionChangedEventHandler handler = null;
+            handler = (o, e) =>
+                {
+                    if (e.Action == NotifyCollectionChangedAction.Add && e.NewItems != null)
+                    {
+                        foreach (RoomViewModel roomViewModel in e.NewItems)
+                        {
+                            if (String.Equals(roomViewModel.Name, roomName, StringComparison.OrdinalIgnoreCase))
+                            {
+                                this.rooms.CollectionChanged -= handler;
+                                tcs.SetResult(roomViewModel);
+                            }
+                        }
+                    }
+                };
+
+            this.rooms.CollectionChanged += handler;
+            this.jabbrClient.JoinRoom(roomName);
+            return tcs.Task;
         }
     }
 

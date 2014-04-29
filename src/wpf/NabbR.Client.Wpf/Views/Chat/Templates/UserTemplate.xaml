@@ -13,6 +13,6 @@
             <Border Width="5" Background="{Binding Path=Status, Converter={StaticResource userStatusToBrushConverter}}" />
             <Image Source="{Binding Path=Hash, Converter={StaticResource hashToGravatarImageConverter}, ConverterParameter=24, IsAsync=True}" Width="24" />
         </StackPanel>
-        <Label Grid.Column="1" Content="{Binding Path=Name}" Margin="10,2" />
+        <TextBlock Grid.Column="1" Text="{Binding Path=Name}" Margin="10,2" />
     </Grid>
 </UserControl>

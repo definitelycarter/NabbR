@@ -121,6 +121,7 @@
     <Compile Include="Common\ObservableDictionary.cs" />
     <Compile Include="Common\RelayCommand.cs" />
     <Compile Include="Common\SuspensionManager.cs" />
+    <Compile Include="Security\CredentialManager.cs" />
     <Compile Include="Services\DialogService.cs" />
     <Compile Include="Services\NinjectDependencyResolver.cs" />
     <Compile Include="Views\Chat\ChatDashboard.xaml.cs">

@@ -1,22 +1,23 @@
-﻿using NabbR.Events;
+﻿using NabbR.Security;
 using NabbR.Services;
 using NabbR.ViewModels.Chat;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 
 namespace NabbR.ViewModels
 {
     public class ShellViewModel : ViewModelBase, INavigationAware
     {
         private readonly IJabbRContext jabbrContext;
-        private readonly IDialogService dialogService;
+        private readonly ICredentialManager credentialManager;
 
         public ShellViewModel(IJabbRContext jabbrContext,
-                              IDialogService dialogService)
+                              ICredentialManager credentialManager)
         {
             this.jabbrContext = jabbrContext;
-            this.dialogService = dialogService;
+            this.credentialManager = credentialManager;
         }
 
         public ObservableCollection<RoomViewModel> Rooms
@@ -24,14 +25,29 @@ namespace NabbR.ViewModels
             get { return this.jabbrContext.Rooms; }
         }
 
-        void INavigationAware.Navigated(IDictionary<String, String> parameters)
+        async void INavigationAware.Navigated(IDictionary<String, String> parameters)
         {
-            this.dialogService.Show<LoginViewModel>("/login", 
-                (vm, dialogResult) =>
+            await this.AuthenticateUserAsync();
+        }
+
+
+        private async Task AuthenticateUserAsync()
+        {
+            Int32 retry = 0;
+            while (retry < 3)
+            {
+                var credentials = await this.credentialManager.GetCredentials("jabbr:credentials");
+                if (credentials != null)
                 {
-                    
+                    var loggedIn = await this.jabbrContext.LoginAsync(credentials.Username, credentials.Password);
+
+                    if (loggedIn)
+                    {
+                        return;
+                    }
                 }
-            );
+                retry++;
+            }
         }
     }
 }

@@ -4,10 +4,11 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:tmpl="clr-namespace:NabbR.Views.Chat.Templates"
+             xmlns:controls="clr-namespace:NabbR.Controls"
              mc:Ignorable="d">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="150" />
+            <ColumnDefinition Width="160" />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
         <tmpl:UserTemplate Grid.Column="0" DataContext="{Binding Path=User}" />
@@ -16,10 +17,7 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <TextBlock Grid.Row="0" 
-                       TextWrapping="Wrap" 
-                       Text="{Binding Path=Content}" />
-            <ContentControl Grid.Row="1" Visibility="Collapsed" Content="{Binding}" />
+            <controls:ChatMessage MessageContent="{Binding Path=Content}" TextWrapping="Wrap" />
         </Grid>
     </Grid>
 </UserControl>

@@ -59,12 +59,19 @@ namespace NabbR.ViewModels.Chat
         /// Called when navigated.
         /// </summary>
         /// <param name="parameters">The parameters.</param>
-        void INavigationAware.Navigated(IDictionary<String, String> parameters)
+        async void INavigationAware.Navigated(IDictionary<String, String> parameters)
         {
             String roomName;
             if (parameters.TryGetValue("room", out roomName))
             {
-                this.Room = this.jabbrContext.Rooms.FirstOrDefault(r => r.Name == roomName);
+                RoomViewModel roomViewModel = this.jabbrContext.Rooms.FirstOrDefault(r => r.Name == roomName);
+
+                if (roomViewModel == null)
+                {
+                    roomViewModel = await this.jabbrContext.JoinRoom(roomName);
+                }
+
+                this.Room = roomViewModel;
             }
         }
     }

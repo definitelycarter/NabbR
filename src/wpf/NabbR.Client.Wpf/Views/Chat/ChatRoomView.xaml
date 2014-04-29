@@ -10,9 +10,10 @@
              xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
              xmlns:controls="clr-namespace:NabbR.Controls"
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
-             mc:Ignorable="d" d:DesignWidth="1000">
+             mc:Ignorable="d" d:DesignHeight="200"  d:DesignWidth="1000">
 
     <UserControl.Resources>
+        <chat:MessageContentTemplateSelector x:Key="messageContentTemplateSelector" />
         <chat:MessageTemplateSelector x:Key="messageTemplateSelector">
             <chat:MessageTemplateSelector.NotificationTemplate>
                 <DataTemplate>
@@ -78,7 +79,7 @@
                                         <Grid>
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition />
-                                                <ColumnDefinition Width="160" />
+                                                <ColumnDefinition Width="100" />
                                             </Grid.ColumnDefinitions>
                                             <ContentControl Grid.Column="0"
                                                 Content="{Binding}"

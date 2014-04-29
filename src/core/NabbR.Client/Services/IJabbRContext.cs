@@ -29,5 +29,6 @@ namespace NabbR.Services
         /// <returns></returns>
         Task<Boolean> LoginAsync(String username, String password);
         Task<Boolean> SendMessage(String message, String roomName);
+        Task<RoomViewModel> JoinRoom(String roomName);
     }
 }
