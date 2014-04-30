@@ -1,6 +1,6 @@
 ﻿using NabbR.ViewModels.Chat;
 using System;
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace NabbR.Services
@@ -15,12 +15,16 @@ namespace NabbR.Services
         /// </value>
         String UserId { get; }
         /// <summary>
+        /// Gets the username of the authenticated user.
+        /// </summary>
+        String Username { get; }
+        /// <summary>
         /// Gets the rooms.
         /// </summary>
         /// <value>
         /// The rooms.
         /// </value>
-        ObservableCollection<RoomViewModel> Rooms { get; }
+        IEnumerable<RoomViewModel> Rooms { get; }
         /// <summary>
         /// Logs in the user.
         /// </summary>
@@ -30,5 +34,6 @@ namespace NabbR.Services
         Task<Boolean> LoginAsync(String username, String password);
         Task<Boolean> SendMessage(String message, String roomName);
         Task<RoomViewModel> JoinRoom(String roomName);
+        Task<IEnumerable<LobbyRoomViewModel>> GetLobbyRooms();
     }
 }

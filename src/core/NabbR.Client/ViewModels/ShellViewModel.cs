@@ -20,7 +20,7 @@ namespace NabbR.ViewModels
             this.credentialManager = credentialManager;
         }
 
-        public ObservableCollection<RoomViewModel> Rooms
+        public IEnumerable<RoomViewModel> Rooms
         {
             get { return this.jabbrContext.Rooms; }
         }

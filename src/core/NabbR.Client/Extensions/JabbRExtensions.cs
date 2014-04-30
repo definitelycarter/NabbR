@@ -24,5 +24,16 @@ namespace NabbR
                 Status = user.Status,
             };
         }
+
+        public static LobbyRoomViewModel AsLobbyRoomViewModel(this Room room)
+        {
+            return new LobbyRoomViewModel
+            {
+                Name = room.Name,
+                Topic = room.Topic,
+                Count = room.Count,
+                Closed = room.Closed,
+            };
+        }
     }
 }

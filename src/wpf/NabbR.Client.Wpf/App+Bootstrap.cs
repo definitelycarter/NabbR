@@ -41,6 +41,7 @@ namespace NabbR.Client
             kernel.Bind<IDialogService>().To<WpfDialogService>().InSingletonScope();
 
             kernel.Bind<ICredentialManager>().To<CredentialManager>().InSingletonScope();
+            kernel.Bind<IEventAggregator>().To<EventAggregator>().InSingletonScope();
         }
     }
 }

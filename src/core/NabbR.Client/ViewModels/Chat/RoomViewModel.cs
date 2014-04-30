@@ -1,15 +1,12 @@
 ﻿using JabbR.Client.Models;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 
 namespace NabbR.ViewModels.Chat
 {
-    public class RoomViewModel : ViewModelBase
+    public class RoomViewModel : RoomViewModelBase
     {
-        private String name;
-        private String topic;
+        private String welcome;
         private readonly ObservableCollection<UserViewModel> users;
         private readonly ObservableCollection<MessageViewModel> messages;
 
@@ -21,38 +18,19 @@ namespace NabbR.ViewModels.Chat
             this.users = new ObservableCollection<UserViewModel>();
             this.messages = new ObservableCollection<MessageViewModel>();
         }
+
         /// <summary>
-        /// Gets the name of the room.
+        /// Gets the room welcome message.
         /// </summary>
         /// <value>
-        /// The name of the room.
-        /// </value>
-        public String Name
-        {
-            get { return name; }
-            set { this.Set(ref name, value); }
-        }
-        /// <summary>
-        /// Gets the room welcome.
-        /// </summary>
-        /// <value>
-        /// The room welcome.
+        /// The room welcome message.
         /// </value>
         public String Welcome
         {
-            get { return null; }
+            get { return this.welcome; }
+            set { this.Set(ref welcome, value); }
         }
-        /// <summary>
-        /// Gets the room topic.
-        /// </summary>
-        /// <value>
-        /// The room topic.
-        /// </value>
-        public String Topic
-        {
-            get { return this.topic; }
-            set { this.Set(ref topic, value); }
-        }
+
         public ObservableCollection<MessageViewModel> Messages
         {
             get { return this.messages; }

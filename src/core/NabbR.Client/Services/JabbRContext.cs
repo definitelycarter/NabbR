@@ -15,7 +15,10 @@ namespace NabbR.Services
 {
     public class JabbRContext : IJabbRContext
     {
+        private String userId;
+        private String username;
         private readonly IJabbRClient jabbrClient;
+        private readonly IEventAggregator eventAggregator;
         private readonly SynchronizationContext _synchronizationContext = SynchronizationContext.Current;
         private readonly ObservableCollection<RoomViewModel> rooms = new ObservableCollection<RoomViewModel>();
         /// <summary>
@@ -28,28 +31,31 @@ namespace NabbR.Services
         /// or
         /// eventAggregator
         /// </exception>
-        public JabbRContext(IJabbRClient jabbrClient)
+        public JabbRContext(IJabbRClient jabbrClient,
+                            IEventAggregator eventAggregator)
         {
             if (jabbrClient == null) throw new ArgumentNullException("jabbrClient");
+            if (eventAggregator == null) throw new ArgumentNullException("eventAggregator");
 
             this.jabbrClient = jabbrClient;
+            this.eventAggregator = eventAggregator;
         }
 
-        /// <summary>
-        /// Gets the user id.
-        /// </summary>
-        /// <value>
-        /// The user id.
-        /// </value>
-        public String UserId { get; private set; }
-        public String Username { get; private set; }
+        String IJabbRContext.UserId
+        {
+            get { return this.userId; }
+        }
+        String IJabbRContext.Username
+        {
+            get { return this.username; }
+        }
         /// <summary>
         /// Gets the rooms.
         /// </summary>
         /// <value>
         /// The rooms.
         /// </value>
-        ObservableCollection<RoomViewModel> IJabbRContext.Rooms
+        IEnumerable<RoomViewModel> IJabbRContext.Rooms
         {
             get { return this.rooms; }
         }
@@ -63,23 +69,9 @@ namespace NabbR.Services
         {
             try
             {
+                this.LogoutUser();
                 LogOnInfo info = await this.jabbrClient.Connect(username, password);
-                this.UserId = info.UserId;
-
-                var userInfo = await this.jabbrClient.GetUserInfo();
-                this.Username = userInfo.Name;
-
-                var roomInfoTasks = info.Rooms.Select(r => this.HandleRoomJoined(r));
-                await Task.WhenAll(roomInfoTasks);
-
-                this.jabbrClient.JoinedRoom += OnRoomJoined;
-                this.jabbrClient.MessageReceived += OnMessageReceived;
-                this.jabbrClient.UserActivityChanged += OnUserActivityChanged;
-                this.jabbrClient.UsersInactive += OnUsersInactive;
-                this.jabbrClient.UserTyping += OnUserTypingChanged;
-                this.jabbrClient.UserLeft += OnUserLeftRoom;
-                this.jabbrClient.UserJoined += OnUserJoinedRoom;
-
+                await this.LoginUser(info);
                 return true;
             }
             catch (Exception)
@@ -88,9 +80,52 @@ namespace NabbR.Services
             }
             return false;
         }
+
         Task<Boolean> IJabbRContext.SendMessage(String message, String roomName)
         {
             return this.jabbrClient.Send(new ClientMessage { Content = message, Room = roomName });
+        }
+
+        Task<RoomViewModel> IJabbRContext.JoinRoom(String roomName)
+        {
+            TaskCompletionSource<RoomViewModel> tcs = new TaskCompletionSource<RoomViewModel>();
+
+            NotifyCollectionChangedEventHandler handler = null;
+            handler = (o, e) =>
+            {
+                if (e.Action == NotifyCollectionChangedAction.Add && e.NewItems != null)
+                {
+                    foreach (RoomViewModel roomViewModel in e.NewItems)
+                    {
+                        if (String.Equals(roomViewModel.Name, roomName, StringComparison.OrdinalIgnoreCase))
+                        {
+                            this.rooms.CollectionChanged -= handler;
+                            tcs.SetResult(roomViewModel);
+                        }
+                    }
+                }
+            };
+
+            this.rooms.CollectionChanged -= handler;
+            this.jabbrClient.JoinRoom(roomName);
+            return tcs.Task;
+        }
+
+        Task<IEnumerable<LobbyRoomViewModel>> IJabbRContext.GetLobbyRooms()
+        {
+            return this.jabbrClient.GetRooms()
+                .ContinueWith(t =>
+                {
+                    IEnumerable<Room> roomInfos = t.Result;
+                    IList<LobbyRoomViewModel> rooms = new List<LobbyRoomViewModel>();
+                    
+                    foreach (Room roomInfo in roomInfos)
+                    {
+                        rooms.Add(roomInfo.AsLobbyRoomViewModel());
+                    }
+
+                    return rooms.AsEnumerable();
+                });
         }
 
         private async void OnRoomJoined(Room roomInfo)
@@ -148,7 +183,7 @@ namespace NabbR.Services
 
                     if (userLeaving != null)
                     {
-                        if (user.Name == Username)
+                        if (user.Name == this.username)
                         {
                             this.rooms.Remove(roomVm);
                         }
@@ -238,30 +273,63 @@ namespace NabbR.Services
             }
         }
 
-
-        public Task<RoomViewModel> JoinRoom(String roomName)
+        private void LogoutUser()
         {
-            TaskCompletionSource<RoomViewModel> tcs = new TaskCompletionSource<RoomViewModel>();
+            this.jabbrClient.JoinedRoom -= OnRoomJoined;
+            this.jabbrClient.MessageReceived -= OnMessageReceived;
+            this.jabbrClient.UserActivityChanged -= OnUserActivityChanged;
+            this.jabbrClient.UsersInactive -= OnUsersInactive;
+            this.jabbrClient.UserTyping -= OnUserTypingChanged;
+            this.jabbrClient.UserLeft -= OnUserLeftRoom;
+            this.jabbrClient.UserJoined -= OnUserJoinedRoom;
 
-            NotifyCollectionChangedEventHandler handler = null;
-            handler = (o, e) =>
+            this.rooms.Clear();
+        }
+        private async Task LoginUser(LogOnInfo logonInfo)
+        {
+            var myUserInfo = await this.jabbrClient.GetUserInfo();
+            this.username = myUserInfo.Name;
+            this.userId = logonInfo.UserId;
+
+            this.jabbrClient.JoinedRoom += OnRoomJoined;
+            this.jabbrClient.MessageReceived += OnMessageReceived;
+            this.jabbrClient.UserActivityChanged += OnUserActivityChanged;
+            this.jabbrClient.UsersInactive += OnUsersInactive;
+            this.jabbrClient.UserTyping += OnUserTypingChanged;
+            this.jabbrClient.UserLeft += OnUserLeftRoom;
+            this.jabbrClient.UserJoined += OnUserJoinedRoom;
+
+            foreach (var roomName in logonInfo.Rooms.Select(r => r.Name).OrderBy(r => r))
+            {
+                RoomViewModel room = new RoomViewModel { Name = roomName };
+                this.RefreshRoomInfoAsync(room);
+                this.rooms.Add(room);
+                this.eventAggregator.Publish(new JoinedRoom { Room = room });
+            }
+        }
+        private void RefreshRoomInfoAsync(RoomViewModel roomViewModel)
+        {
+            this.jabbrClient.GetRoomInfo(roomViewModel.Name)
+                .ContinueWith(t =>
                 {
-                    if (e.Action == NotifyCollectionChangedAction.Add && e.NewItems != null)
-                    {
-                        foreach (RoomViewModel roomViewModel in e.NewItems)
+                    Room room = t.Result;
+                    _synchronizationContext.InvokeIfRequired(() =>
                         {
-                            if (String.Equals(roomViewModel.Name, roomName, StringComparison.OrdinalIgnoreCase))
-                            {
-                                this.rooms.CollectionChanged -= handler;
-                                tcs.SetResult(roomViewModel);
-                            }
-                        }
-                    }
-                };
+                            roomViewModel.Name = room.Name;
+                            roomViewModel.Topic = room.Topic;
+                            roomViewModel.Welcome = room.Welcome;
 
-            this.rooms.CollectionChanged += handler;
-            this.jabbrClient.JoinRoom(roomName);
-            return tcs.Task;
+                            foreach (var user in room.Users)
+                            {
+                                this.HandleUserJoiningRoom(roomViewModel, user);
+                            }
+
+                            foreach (var message in room.RecentMessages)
+                            {
+                                this.HandleMessageReceived(message, roomViewModel);
+                            }
+                        });
+                }, TaskContinuationOptions.OnlyOnRanToCompletion);
         }
     }
 

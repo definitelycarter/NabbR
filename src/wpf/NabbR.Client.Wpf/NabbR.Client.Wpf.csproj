@@ -16,6 +16,7 @@
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
     <IsWebBootstrapper>true</IsWebBootstrapper>
+    <ExpressionBlendVersion>12.0.50320.0</ExpressionBlendVersion>
     <PublishUrl>ftp://waws-prod-blu-003.ftp.azurewebsites.windows.net/site/wwwroot/download/</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Web</InstallFrom>
@@ -145,6 +146,9 @@
     <Compile Include="Views\Chat\ChatRoomView.xaml.cs">
       <DependentUpon>ChatRoomView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Chat\LobbyView.xaml.cs">
+      <DependentUpon>LobbyView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Chat\Templates\ChatMessageTemplate.xaml.cs">
       <DependentUpon>ChatMessageTemplate.xaml</DependentUpon>
     </Compile>
@@ -189,6 +193,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\Chat\ChatRoomView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Chat\LobbyView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

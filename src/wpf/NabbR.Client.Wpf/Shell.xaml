@@ -1,9 +1,17 @@
 ﻿<mui:ModernWindow x:Class="NabbR.Client.Shell" x:ClassModifier="internal"
                   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                  xmlns:mui="http://firstfloorsoftware.com/ModernUI">
+                  xmlns:mui="http://firstfloorsoftware.com/ModernUI" Title="NabbR" IsTitleVisible="True">
+    <mui:ModernWindow.TitleLinks>
+        <mui:Link DisplayName="settings" />
+    </mui:ModernWindow.TitleLinks>
     <mui:ModernWindow.MenuLinkGroups>
-        <mui:LinkGroup x:Name="chatGroup" DisplayName="Chat">
+        <mui:LinkGroup x:Name="chatGroup" DisplayName="public chat">
+            <mui:LinkGroup.Links>
+                <mui:Link DisplayName="Lobby" Source="/chat/lobby" />
+            </mui:LinkGroup.Links>
+        </mui:LinkGroup>
+        <mui:LinkGroup x:Name="directMessages" DisplayName="direct messages">
         </mui:LinkGroup>
     </mui:ModernWindow.MenuLinkGroups>
 </mui:ModernWindow>
