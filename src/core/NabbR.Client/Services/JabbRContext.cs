@@ -106,7 +106,7 @@ namespace NabbR.Services
                 }
             };
 
-            this.rooms.CollectionChanged -= handler;
+            this.rooms.CollectionChanged += handler;
             this.jabbrClient.JoinRoom(roomName);
             return tcs.Task;
         }
@@ -183,6 +183,7 @@ namespace NabbR.Services
                         if (user.Name == this.username)
                         {
                             this.rooms.Remove(roomVm);
+                            this.eventAggregator.Publish(new LeftRoom { Room = roomVm });
                         }
                         else
                         {
@@ -239,6 +240,7 @@ namespace NabbR.Services
                                 this.HandleMessageReceived(message, roomVm);
                             }
 
+                            this.eventAggregator.Publish(new JoinedRoom { Room = roomVm });
                             this.rooms.Add(roomVm);
                         });
                 }, TaskContinuationOptions.OnlyOnRanToCompletion);
@@ -250,7 +252,6 @@ namespace NabbR.Services
             {
                 userVm = message.User.AsViewModel();
                 userVm.Status = UserStatus.Offline;
-                room.Users.Add(userVm);
             }
 
             MessageViewModel messageVm = new UserMessageViewModel(message, userVm);

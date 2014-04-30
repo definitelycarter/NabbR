@@ -33,10 +33,7 @@ namespace NabbR.Client
             ModernFrame frame = (ModernFrame)this.Template.FindName("ContentFrame", this);
 
             // critical to make navigation work
-            // frame.KeepContentAlive = false;
-            frame.Navigated += (o, e) =>
-                {
-                };
+            frame.KeepContentAlive = false;
         }
 
         public void Handle(JoinedRoom message)
