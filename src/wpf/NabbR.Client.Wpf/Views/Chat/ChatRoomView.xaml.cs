@@ -14,13 +14,12 @@ namespace NabbR.Views.Chat
     partial class ChatRoomView
     {
         private ChatRoomViewModel chatRoom;
-        private LoadingStates loadingState;
+        
         public ChatRoomView()
         {
             InitializeComponent();
             this.DataContextChanged += OnDataContextChanged;
         }
-
 
         public ChatRoomViewModel ChatRoom
         {
@@ -45,13 +44,7 @@ namespace NabbR.Views.Chat
                 e.Accepted = false;
             }
         }
-
-        private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
-        {
-            this.ChatRoom = (ChatRoomViewModel)e.NewValue;
-        }
-
-        private void TextBox_KeyUp(Object sender, KeyEventArgs e)
+        private void ComposeMessageElement_KeyUp(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter || e.Key == Key.Return)
             {
@@ -63,14 +56,17 @@ namespace NabbR.Views.Chat
                 }
             }
         }
-
-
         private void OnChatRoomPropertyChanged(Object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == "LoadingState")
             {
-                VisualStateManager.GoToState(this, this.ChatRoom.LoadingState.ToString(), true);
+                String stateName = String.Concat("Chat", this.ChatRoom.LoadingState);
+                VisualStateManager.GoToState(this, stateName, true);
             }
+        }
+        private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            this.ChatRoom = (ChatRoomViewModel)e.NewValue;
         }
     }
 }

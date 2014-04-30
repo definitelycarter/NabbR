@@ -38,8 +38,8 @@
     <Grid d:DataContext="{d:DesignInstance Type=vm:ChatRoomViewModel}">
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup x:Name="LoadStates">
-                <VisualState x:Name="Loaded" />
-                <VisualState x:Name="Loading">
+                <VisualState x:Name="ChatLoaded" />
+                <VisualState x:Name="ChatLoading">
                     <Storyboard>
                         <ObjectAnimationUsingKeyFrames Duration="0:0:0" Storyboard.TargetName="ProgressIndicator" Storyboard.TargetProperty="(UIElement.Visibility)">
                             <DiscreteObjectKeyFrame KeyTime="0:0:0" Value="{x:Static Visibility.Visible}"/>
@@ -49,7 +49,7 @@
                         </ObjectAnimationUsingKeyFrames>
                     </Storyboard>
                 </VisualState>
-                <VisualState x:Name="LoadFailed">
+                <VisualState x:Name="ChatLoadFailed">
                     <Storyboard>
                         <ObjectAnimationUsingKeyFrames Duration="0:0:0" Storyboard.TargetName="ProgressIndicator" Storyboard.TargetProperty="(UIElement.Visibility)">
                             <DiscreteObjectKeyFrame KeyTime="0:0:0" Value="{x:Static Visibility.Visible}" />
@@ -129,7 +129,7 @@
                                     <ColumnDefinition />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <TextBox Margin="5,0" Text="{Binding Path=MessageToSend, UpdateSourceTrigger=PropertyChanged}" KeyUp="TextBox_KeyUp" />
+                                <TextBox x:Name="ComposeMessageElement" Margin="5,0" Text="{Binding Path=MessageToSend, UpdateSourceTrigger=PropertyChanged}" KeyUp="ComposeMessageElement_KeyUp" />
                                 <Button Grid.Column="1" Content="Send" Command="{Binding Path=SendMessageCommand}" />
                             </Grid>
                         </Grid>

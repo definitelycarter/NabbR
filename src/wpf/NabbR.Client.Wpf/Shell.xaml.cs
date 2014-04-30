@@ -2,13 +2,9 @@
 using NabbR.Controls;
 using NabbR.Events;
 using NabbR.ViewModels;
-using NabbR.ViewModels.Chat;
 using NabbR.Views;
 using System;
-using System.Collections.Specialized;
 using System.Linq;
-using System.Windows;
-using System.Windows.Media;
 
 namespace NabbR.Client
 {
@@ -36,14 +32,6 @@ namespace NabbR.Client
             frame.KeepContentAlive = false;
         }
 
-        public void Handle(JoinedRoom message)
-        {
-            var room = message.Room;
-            var roomUri = String.Format("/chatroom?room={0}", room.Name);
-            var link = new RoomLink { RoomName = room.Name, DisplayName = room.Name, Source = new Uri(roomUri, UriKind.RelativeOrAbsolute) };
-            this.chatGroup.Links.Add(link);
-        }
-
         public void Handle(LeftRoom message)
         {
             var leftRoom = message.Room;
@@ -52,6 +40,13 @@ namespace NabbR.Client
 
             var navigationLink = this.chatGroup.Links.FirstOrDefault();
             this.ContentSource = navigationLink.Source;
+        }
+        public void Handle(JoinedRoom message)
+        {
+            var room = message.Room;
+            var roomUri = String.Format("/chatroom?room={0}", room.Name);
+            var link = new RoomLink { RoomName = room.Name, DisplayName = room.Name, Source = new Uri(roomUri, UriKind.RelativeOrAbsolute) };
+            this.chatGroup.Links.Add(link);
         }
     }
 }

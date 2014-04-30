@@ -52,9 +52,9 @@ namespace NabbR.ViewModels.Chat
         {
         }
 
-        void INavigationAware.Navigated(IDictionary<String, String> parameters)
+        async void INavigationAware.Navigated(IDictionary<String, String> parameters)
         {
-            this.GetLobbyRooms();
+            await this.GetLobbyRooms();
         }
 
         private async Task GetLobbyRooms()

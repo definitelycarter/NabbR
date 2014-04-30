@@ -81,11 +81,10 @@ namespace NabbR.Services
             return false;
         }
 
-        Task<Boolean> IJabbRContext.SendMessage(String message, String roomName)
+        Task IJabbRContext.SetTyping(String roomName)
         {
-            return this.jabbrClient.Send(new ClientMessage { Content = message, Room = roomName });
+            return this.jabbrClient.SetTyping(roomName);
         }
-
         Task<RoomViewModel> IJabbRContext.JoinRoom(String roomName)
         {
             TaskCompletionSource<RoomViewModel> tcs = new TaskCompletionSource<RoomViewModel>();
@@ -110,33 +109,29 @@ namespace NabbR.Services
             this.jabbrClient.JoinRoom(roomName);
             return tcs.Task;
         }
-
-        async Task<IEnumerable<LobbyRoomViewModel>> IJabbRContext.GetLobbyRooms()
+        Task<IEnumerable<LobbyRoomViewModel>> IJabbRContext.GetLobbyRooms()
         {
-            var scheduler = TaskScheduler.Default;
-            var roomInfos = await this.jabbrClient.GetRooms();
-            IList<LobbyRoomViewModel> rooms = new List<LobbyRoomViewModel>();
+            return this.jabbrClient.GetRooms()
+                .ContinueWith(t =>
+                {
+                    var roomInfos = t.Result;
 
-            foreach (Room roomInfo in roomInfos)
-            {
-                rooms.Add(roomInfo.AsLobbyRoomViewModel());
-            }
+                    IList<LobbyRoomViewModel> rooms = new List<LobbyRoomViewModel>();
 
-            return rooms;
+                    foreach (Room roomInfo in roomInfos)
+                    {
+                        rooms.Add(roomInfo.AsLobbyRoomViewModel());
+                    }
+
+                    return rooms.AsEnumerable();
+                });
+        }
+        Task<Boolean> IJabbRContext.SendMessage(String message, String roomName)
+        {
+            return this.jabbrClient.Send(message, roomName);
         }
 
-        private async void OnRoomJoined(Room roomInfo)
-        {
-            await this.HandleRoomJoined(roomInfo);
-        }
-
-        private void OnUsersInactive(IEnumerable<User> users)
-        {
-            foreach (var user in users)
-            {
-                this.OnUserActivityChanged(user);
-            }
-        }
+        #region JabbR Events
         private void OnUserActivityChanged(User user)
         {
             _synchronizationContext.InvokeIfRequired(() =>
@@ -156,17 +151,16 @@ namespace NabbR.Services
                     }
                 });
         }
-        private void OnUserJoinedRoom(User user, String roomName, Boolean arg3)
+        private void OnRoomJoined(Room roomInfo)
         {
-            _synchronizationContext.InvokeIfRequired(() =>
-                {
-                    RoomViewModel roomVm = this.rooms.FirstOrDefault(r => r.Name == roomName);
-
-                    if (roomVm != null)
-                    {
-                        this.HandleUserJoiningRoom(roomVm, user);
-                    }
-                });
+            this.HandleRoomJoined(roomInfo);
+        }
+        private void OnUsersInactive(IEnumerable<User> users)
+        {
+            foreach (var user in users)
+            {
+                this.OnUserActivityChanged(user);
+            }
         }
         private void OnUserLeftRoom(User user, String roomName)
         {
@@ -219,6 +213,23 @@ namespace NabbR.Services
                     }
                 });
         }
+        private void OnUserJoinedRoom(User user, String roomName, Boolean arg3)
+        {
+            _synchronizationContext.InvokeIfRequired(() =>
+            {
+                RoomViewModel roomVm = this.rooms.FirstOrDefault(r => r.Name == roomName);
+
+                if (roomVm != null)
+                {
+                    this.HandleUserJoiningRoom(roomVm, user);
+                }
+            });
+        }
+        private void OnPrivateMessageReceived(String from, String to, String message)
+        {
+
+        }
+        #endregion
 
         private Task HandleRoomJoined(Room roomInfo)
         {
@@ -280,7 +291,7 @@ namespace NabbR.Services
             this.jabbrClient.UserTyping -= OnUserTypingChanged;
             this.jabbrClient.UserLeft -= OnUserLeftRoom;
             this.jabbrClient.UserJoined -= OnUserJoinedRoom;
-
+            this.jabbrClient.PrivateMessage -= OnPrivateMessageReceived;
             this.rooms.Clear();
         }
         private async Task LoginUser(LogOnInfo logonInfo)
@@ -296,7 +307,8 @@ namespace NabbR.Services
             this.jabbrClient.UserTyping += OnUserTypingChanged;
             this.jabbrClient.UserLeft += OnUserLeftRoom;
             this.jabbrClient.UserJoined += OnUserJoinedRoom;
-
+            this.jabbrClient.PrivateMessage += OnPrivateMessageReceived;
+            
             foreach (var roomName in logonInfo.Rooms.Select(r => r.Name).OrderBy(r => r))
             {
                 RoomViewModel room = new RoomViewModel { Name = roomName };
@@ -328,6 +340,21 @@ namespace NabbR.Services
                             }
                         });
                 }, TaskContinuationOptions.OnlyOnRanToCompletion);
+        }
+
+        private void UpdateUserInFoundRooms(String userName, Action<UserViewModel> userUpdateDelegate)
+        {
+            foreach (var room in this.rooms)
+            {
+                foreach (var u in room.Users)
+                {
+                    if (String.Equals(u.Name, userName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        userUpdateDelegate(u);
+                        break;
+                    }
+                }
+            }
         }
     }
 

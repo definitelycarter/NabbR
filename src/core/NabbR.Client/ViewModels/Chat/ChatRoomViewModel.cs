@@ -43,6 +43,7 @@ namespace NabbR.ViewModels.Chat
                 if (this.Set(ref this.messageToSend, value))
                 {
                     this.SendMessageCommand.RaiseCanExecuteChanged();
+                    this.NotifyTyping();
                 }
             }
         }
@@ -81,6 +82,20 @@ namespace NabbR.ViewModels.Chat
 
                 this.LoadingState = LoadingStates.Loaded;
                 this.Room = roomViewModel;
+            }
+        }
+
+        private DateTime lastNotificationSent;
+
+        private void NotifyTyping()
+        {
+            TimeSpan timeLastSent = DateTime.Now.Subtract(lastNotificationSent);
+            if (this.Room != null && timeLastSent.TotalSeconds > 3)
+            {
+                lastNotificationSent = DateTime.Now;
+
+                String roomName = this.Room.Name;
+                this.jabbrContext.SetTyping(roomName);
             }
         }
     }

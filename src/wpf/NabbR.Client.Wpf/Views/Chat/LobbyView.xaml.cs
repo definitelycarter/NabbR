@@ -32,16 +32,6 @@ namespace NabbR.Views.Chat
             }
         }
 
-        private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
-        {
-            this.Lobby = (LobbyViewModel)e.NewValue;
-        }
-
-        private void OnIncludeClosedRoomsCheckChanged(Object sender, RoutedEventArgs e)
-        {
-            
-        }
-
         private void OnFilter(Object sender, FilterEventArgs e)
         {
             LobbyRoomViewModel lvm = e.Item as LobbyRoomViewModel;
@@ -51,12 +41,19 @@ namespace NabbR.Views.Chat
                 e.Accepted = !lvm.Closed || IncludeClosedRoomsCheckBox.IsChecked.GetValueOrDefault();
             }
         }
-
+        private void OnIncludeClosedRoomsCheckChanged(Object sender, RoutedEventArgs e)
+        {
+        }
+        private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            this.Lobby = (LobbyViewModel)e.NewValue;
+        }
         private void OnLobbyViewModelPropertyChanged(Object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == "LoadingState")
             {
-                VisualStateManager.GoToState(this, this.Lobby.LoadingState.ToString(), true);
+                String stateName = String.Concat("Lobby", this.Lobby.LoadingState);
+                VisualStateManager.GoToState(this, stateName, true);
             }
         }
     }

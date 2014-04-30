@@ -12,8 +12,8 @@
     <Grid d:DataContext="{d:DesignInstance Type=chatvm:LobbyViewModel, IsDesignTimeCreatable=True}">
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup x:Name="LoadStates">
-                <VisualState x:Name="Loaded" />
-                <VisualState x:Name="Loading">
+                <VisualState x:Name="LobbyLoaded" />
+                <VisualState x:Name="LobbyLoading">
                     <Storyboard>
                         <ObjectAnimationUsingKeyFrames Duration="0:0:0" Storyboard.TargetName="ProgressIndicator" Storyboard.TargetProperty="(UIElement.Visibility)">
                             <DiscreteObjectKeyFrame KeyTime="0:0:0" Value="{x:Static Visibility.Visible}"/>
@@ -23,7 +23,7 @@
                         </ObjectAnimationUsingKeyFrames>
                     </Storyboard>
                 </VisualState>
-                <VisualState x:Name="LoadFailed">
+                <VisualState x:Name="LobbyLoadFailed">
                     <Storyboard>
                         <ObjectAnimationUsingKeyFrames Duration="0:0:0" Storyboard.TargetName="ProgressIndicator" Storyboard.TargetProperty="(UIElement.Visibility)">
                             <DiscreteObjectKeyFrame KeyTime="0:0:0" Value="{x:Static Visibility.Visible}" />
