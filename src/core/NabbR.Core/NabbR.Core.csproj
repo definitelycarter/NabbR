@@ -50,6 +50,7 @@
     <Compile Include="Security\ICredentialManager.cs" />
     <Compile Include="Services\IDialogService.cs" />
     <Compile Include="Services\IDependencyResolver.cs" />
+    <Compile Include="Types.cs" />
     <Compile Include="ViewModels\CommandViewModel.cs" />
     <Compile Include="ViewModels\DialogViewModel.cs" />
     <Compile Include="ViewModels\INavigationAware.cs" />

@@ -111,21 +111,18 @@ namespace NabbR.Services
             return tcs.Task;
         }
 
-        Task<IEnumerable<LobbyRoomViewModel>> IJabbRContext.GetLobbyRooms()
+        async Task<IEnumerable<LobbyRoomViewModel>> IJabbRContext.GetLobbyRooms()
         {
-            return this.jabbrClient.GetRooms()
-                .ContinueWith(t =>
-                {
-                    IEnumerable<Room> roomInfos = t.Result;
-                    IList<LobbyRoomViewModel> rooms = new List<LobbyRoomViewModel>();
-                    
-                    foreach (Room roomInfo in roomInfos)
-                    {
-                        rooms.Add(roomInfo.AsLobbyRoomViewModel());
-                    }
+            var scheduler = TaskScheduler.Default;
+            var roomInfos = await this.jabbrClient.GetRooms();
+            IList<LobbyRoomViewModel> rooms = new List<LobbyRoomViewModel>();
 
-                    return rooms.AsEnumerable();
-                });
+            foreach (Room roomInfo in roomInfos)
+            {
+                rooms.Add(roomInfo.AsLobbyRoomViewModel());
+            }
+
+            return rooms;
         }
 
         private async void OnRoomJoined(Room roomInfo)

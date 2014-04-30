@@ -11,6 +11,7 @@ namespace NabbR.ViewModels.Chat
     {
         private RoomViewModel room;
         private String messageToSend;
+        private LoadingStates loadingState;
         private readonly IJabbRContext jabbrContext;
         private IDelegateCommand sendMessageCommand;
 
@@ -46,6 +47,12 @@ namespace NabbR.ViewModels.Chat
             }
         }
 
+        public LoadingStates LoadingState
+        {
+            get { return this.loadingState; }
+            set { this.Set(ref this.loadingState, value); }
+        }
+
         private void HandleSendMessage()
         {
             this.jabbrContext.SendMessage(messageToSend, this.room.Name);
@@ -64,6 +71,7 @@ namespace NabbR.ViewModels.Chat
             String roomName;
             if (parameters.TryGetValue("room", out roomName))
             {
+                this.LoadingState = LoadingStates.Loading;
                 RoomViewModel roomViewModel = this.jabbrContext.Rooms.FirstOrDefault(r => r.Name == roomName);
 
                 if (roomViewModel == null)
@@ -71,6 +79,7 @@ namespace NabbR.ViewModels.Chat
                     roomViewModel = await this.jabbrContext.JoinRoom(roomName);
                 }
 
+                this.LoadingState = LoadingStates.Loaded;
                 this.Room = roomViewModel;
             }
         }

@@ -7,6 +7,8 @@
     <converters:UserStatusToBrushConverter x:Key="userStatusToBrushConverter" ActiveBrush="#77d42a" InactiveBrush="#fa2" OfflineBrush="Transparent" />
     <converters:HashToGravatarImageConverter x:Key="hashToGravatarImageConverter" />
     
+    <SolidColorBrush x:Key="AccentBrush" Color="{DynamicResource AccentColor}" />
+    
     <DataTemplate x:Key="DialogButtonTemplate" DataType="{x:Type corevm:CommandViewModel}">
         <Button Margin="2,0,0,0"
 			    Content="{Binding Caption, Mode=OneTime}"
