@@ -145,7 +145,7 @@ namespace NabbR.Services
                             if (userVm.Status != user.Status)
                             {
                                 userVm.Status = user.Status;
-                                room.AddNotification(String.Format("{0} has become {1}.", user.Name, userVm.Status));
+                                // room.AddNotification(String.Format("{0} has become {1}.", user.Name, userVm.Status));
                             }
                         }
                     }

@@ -127,7 +127,7 @@
                                     <ColumnDefinition />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <TextBox x:Name="ComposeMessageElement" Margin="5,0" Text="{Binding Path=MessageToSend, UpdateSourceTrigger=PropertyChanged}" KeyUp="ComposeMessageElement_KeyUp" />
+                                <TextBox x:Name="ComposeMessageElement" Margin="5,0" Text="{Binding Path=ComposedMessage, UpdateSourceTrigger=PropertyChanged}" KeyUp="ComposeMessageElement_KeyUp" />
                                 <Button Grid.Column="1" Content="Send" Command="{Binding Path=SendMessageCommand}" />
                             </Grid>
                         </Grid>

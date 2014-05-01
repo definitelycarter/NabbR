@@ -45,20 +45,24 @@ namespace NabbR.Controls
 
         private void Rebuild()
         {
-            var split = Regex.Split(this.MessageContent, ChatMessagePattern);
-
-            foreach (var item in split)
+            this.Inlines.Clear();
+            if (!String.IsNullOrEmpty(this.MessageContent))
             {
-                var matches = Regex.Matches(item, ChatMessagePattern);
+                var split = Regex.Split(this.MessageContent, ChatMessagePattern, RegexOptions.Compiled);
 
-                if (matches.Count == 0)
+                foreach (var item in split)
                 {
-                    this.Inlines.Add(new Run(item));
-                }
-                else
-                {
-                    foreach (Match m in matches)
-                        this.AddMatch(m);
+                    var matches = Regex.Matches(item, ChatMessagePattern);
+
+                    if (matches.Count == 0)
+                    {
+                        this.Inlines.Add(new Run(item));
+                    }
+                    else
+                    {
+                        foreach (Match m in matches)
+                            this.AddMatch(m);
+                    }
                 }
             }
         }

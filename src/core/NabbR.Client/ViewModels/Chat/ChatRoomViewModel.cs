@@ -10,7 +10,7 @@ namespace NabbR.ViewModels.Chat
     public class ChatRoomViewModel : ViewModelBase, INavigationAware
     {
         private RoomViewModel room;
-        private String messageToSend;
+        private String composedMessage;
         private LoadingStates loadingState;
         private readonly IJabbRContext jabbrContext;
         private IDelegateCommand sendMessageCommand;
@@ -23,6 +23,8 @@ namespace NabbR.ViewModels.Chat
         {
             this.jabbrContext = jabbrContext;
         }
+
+#if DEBUG
         public ChatRoomViewModel()
         {
             this.Room = new RoomViewModel
@@ -39,6 +41,7 @@ namespace NabbR.ViewModels.Chat
             this.Room.Messages.Add(new Chat.UserMessageViewModel { User = this.Room.Users[1], Content = "That message is really cool!", MessageDateTime = DateTimeOffset.Now });
             this.Room.Messages.Add(new Chat.MessageViewModel { Content = "bryan_the_bot as become inactive.", MessageDateTime = DateTime.Now });
         }
+#endif
 
         public RoomViewModel Room
         {
@@ -51,12 +54,12 @@ namespace NabbR.ViewModels.Chat
             get { return this.sendMessageCommand ?? (this.sendMessageCommand = new DelegateCommand(() => this.HandleSendMessage(), () => this.CanSendMessage())); }
         }
 
-        public String MessageToSend
+        public String ComposedMessage
         {
-            get { return this.messageToSend; }
+            get { return this.composedMessage; }
             set
             {
-                if (this.Set(ref this.messageToSend, value))
+                if (this.Set(ref this.composedMessage, value))
                 {
                     this.SendMessageCommand.RaiseCanExecuteChanged();
                     this.NotifyTyping();
@@ -72,12 +75,12 @@ namespace NabbR.ViewModels.Chat
 
         private void HandleSendMessage()
         {
-            this.jabbrContext.SendMessage(messageToSend, this.room.Name);
-            this.MessageToSend = null;
+            this.jabbrContext.SendMessage(composedMessage, this.room.Name);
+            this.ComposedMessage = null;
         }
         private Boolean CanSendMessage()
         {
-            return !String.IsNullOrWhiteSpace(this.MessageToSend);
+            return !String.IsNullOrWhiteSpace(this.ComposedMessage);
         }
         /// <summary>
         /// Called when navigated.
