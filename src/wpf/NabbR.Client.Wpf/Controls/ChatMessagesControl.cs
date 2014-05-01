@@ -12,31 +12,38 @@ namespace NabbR.Controls
 
         private ScrollViewer scrollViewer;
 
+        public ChatMessagesControl()
+        {
+            this.ShouldScrollToBottom = true;
+        }
         static ChatMessagesControl()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(ChatMessagesControl), new FrameworkPropertyMetadata(typeof(ChatMessagesControl)));
         }
 
+        public Boolean ShouldScrollToBottom { get; private set; }
+
         public override void OnApplyTemplate()
         {
-            base.OnApplyTemplate();
             this.scrollViewer = (ScrollViewer)this.Template.FindName(ScrollViewerElementName, this);
+            this.scrollViewer.ScrollChanged += OnScrollChanged;
+            base.OnApplyTemplate();
         }
 
-        protected override void OnItemsChanged(NotifyCollectionChangedEventArgs e)
+        private void OnScrollChanged(Object sender, ScrollChangedEventArgs e)
         {
-            base.OnItemsChanged(e);
-
-            if (e.Action == NotifyCollectionChangedAction.Add && e.NewItems != null)
+            if (e.ExtentHeightChange > 0 && ShouldScrollToBottom)
             {
                 this.scrollViewer.ScrollToBottom();
             }
-        }
-
-        protected override void OnItemsSourceChanged(IEnumerable oldValue, IEnumerable newValue)
-        {
-            base.OnItemsSourceChanged(oldValue, newValue);
-            this.scrollViewer.ScrollToBottom();
+            else if (this.ShouldScrollToBottom && (e.VerticalChange - e.ExtentHeightChange < 0))
+            {
+                this.ShouldScrollToBottom = false;
+            }
+            else if (!this.ShouldScrollToBottom && (e.VerticalOffset == this.scrollViewer.ScrollableHeight))
+            {
+                this.ShouldScrollToBottom = true;
+            }
         }
     }
 }

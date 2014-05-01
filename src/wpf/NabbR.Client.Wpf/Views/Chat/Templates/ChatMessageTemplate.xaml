@@ -11,14 +11,14 @@
             <ColumnDefinition Width="160" />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
-        <Grid DataContext="{Binding Path=User}">
+        <Grid Grid.Row="0" DataContext="{Binding Path=User}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
             <StackPanel Grid.Column="0" Orientation="Horizontal" Height="24" VerticalAlignment="Top" ToolTip="{Binding Path=Note}">
                 <Border Width="5" Background="{Binding Path=Status, Converter={StaticResource userStatusToBrushConverter}}" />
-                <Image Source="{Binding Path=Hash, Converter={StaticResource hashToGravatarImageConverter}, ConverterParameter=24}" Width="24" />
+                <Image Source="{Binding Path=Hash, Converter={StaticResource hashToGravatarImageConverter}, ConverterParameter=24, IsAsync=True}" Width="24" />
             </StackPanel>
             <TextBlock Grid.Column="1" Text="{Binding Path=Name}" Margin="10,2" />
         </Grid>

@@ -12,5 +12,5 @@
             </mui:LinkGroup.Links>
         </mui:LinkGroup>
     </mui:ModernWindow.MenuLinkGroups>
-    <MediaElement x:Name="mediaElement" Source="http://jabbr.net/content/sounds/notification.wav" LoadedBehavior="Manual" UnloadedBehavior="Manual" />
+    <MediaElement x:Name="mediaElement" Source="http://jabbr.net/content/sounds/notification.wav" LoadedBehavior="Manual" UnloadedBehavior="Manual" Volume="1" />
 </mui:ModernWindow>

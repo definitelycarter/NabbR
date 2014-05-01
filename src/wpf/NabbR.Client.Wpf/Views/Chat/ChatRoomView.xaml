@@ -90,7 +90,7 @@
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition />
-                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="190" />
                     </Grid.ColumnDefinitions>
                     <Grid Grid.Column="0">
                         <Grid.RowDefinitions>
@@ -99,7 +99,7 @@
                         </Grid.RowDefinitions>
 
                         <Grid Grid.Row="0">
-                            <controls:ChatMessagesControl ItemsSource="{Binding Path=Room.Messages, IsAsync=True}">
+                            <controls:ChatMessagesControl x:Name="ChatMessageControl" ItemsSource="{Binding Path=Room.Messages}">
                                 <controls:ChatMessagesControl.ItemTemplate>
                                     <DataTemplate>
                                         <Border Margin="5,0,5,2">
