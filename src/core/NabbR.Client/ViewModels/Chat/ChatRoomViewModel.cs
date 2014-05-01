@@ -23,6 +23,22 @@ namespace NabbR.ViewModels.Chat
         {
             this.jabbrContext = jabbrContext;
         }
+        public ChatRoomViewModel()
+        {
+            this.Room = new RoomViewModel
+            {
+                Name = "This is a design-time room name.",
+                Topic = "This is a design-time room topic.",
+                Welcome = "This is a design-time room welcome message.",
+            };
+
+            this.Room.Users.Add(new UserViewModel{ Name = "definitelycarter", IsTyping = true, Hash = "0ca89936b4a526bc1ee7ad4c5eb6fcbe", Status = JabbR.Client.Models.UserStatus.Inactive});
+            this.Room.Users.Add(new UserViewModel { Name = "davepermen.net", IsTyping = false, Hash = "6ad5f8c742f1e8ec61000e2b0900fc76", Status = JabbR.Client.Models.UserStatus.Active });
+
+            this.Room.Messages.Add(new Chat.UserMessageViewModel { User = this.Room.Users[0], Content = "This is a design-time message!", MessageDateTime = DateTimeOffset.Now });
+            this.Room.Messages.Add(new Chat.UserMessageViewModel { User = this.Room.Users[1], Content = "That message is really cool!", MessageDateTime = DateTimeOffset.Now });
+            this.Room.Messages.Add(new Chat.MessageViewModel { Content = "bryan_the_bot as become inactive.", MessageDateTime = DateTime.Now });
+        }
 
         public RoomViewModel Room
         {

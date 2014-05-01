@@ -1,4 +1,5 @@
 ﻿using JabbR.Client.Models;
+using NabbR.Events;
 using NabbR.ViewModels;
 using NabbR.ViewModels.Chat;
 using System;
@@ -14,11 +15,17 @@ namespace NabbR.Views.Chat
     partial class ChatRoomView
     {
         private ChatRoomViewModel chatRoom;
-        
+
         public ChatRoomView()
         {
             InitializeComponent();
             this.DataContextChanged += OnDataContextChanged;
+        }
+
+        public ChatRoomView(IEventAggregator eventAggregator)
+            : this()
+        {
+            eventAggregator.Subscribe(this);
         }
 
         public ChatRoomViewModel ChatRoom
@@ -38,7 +45,7 @@ namespace NabbR.Views.Chat
         private void UserFilter(object sender, FilterEventArgs e)
         {
             UserViewModel userViewModel = (UserViewModel)e.Item;
-            
+
             if (userViewModel.Status == UserStatus.Offline)
             {
                 e.Accepted = false;

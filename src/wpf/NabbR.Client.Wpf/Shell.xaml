@@ -11,7 +11,6 @@
                 <mui:Link DisplayName="Lobby" Source="/chat/lobby" />
             </mui:LinkGroup.Links>
         </mui:LinkGroup>
-        <mui:LinkGroup x:Name="directMessages" DisplayName="direct messages">
-        </mui:LinkGroup>
     </mui:ModernWindow.MenuLinkGroups>
+    <MediaElement x:Name="mediaElement" Source="http://jabbr.net/content/sounds/notification.wav" LoadedBehavior="Manual" UnloadedBehavior="Manual" />
 </mui:ModernWindow>

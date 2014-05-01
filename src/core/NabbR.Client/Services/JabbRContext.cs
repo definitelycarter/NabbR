@@ -193,11 +193,14 @@ namespace NabbR.Services
             _synchronizationContext.InvokeIfRequired(() =>
             {
                 RoomViewModel roomVm = this.rooms.FirstOrDefault(r => r.Name == roomName);
-                UserViewModel userVm = roomVm.Users.FirstOrDefault(u => u.Name == user.Name);
-
-                if (userVm != null)
+                if (roomVm != null)
                 {
-                    userVm.IsTyping = true;
+                    UserViewModel userVm = roomVm.Users.FirstOrDefault(u => u.Name == user.Name);
+
+                    if (userVm != null)
+                    {
+                        userVm.IsTyping = true;
+                    }
                 }
             });
         }
@@ -210,6 +213,7 @@ namespace NabbR.Services
                     if (room != null)
                     {
                         this.HandleMessageReceived(message, room);
+                        this.eventAggregator.Publish(new MessageReceived { RoomName = roomName });
                     }
                 });
         }
@@ -267,6 +271,7 @@ namespace NabbR.Services
 
             MessageViewModel messageVm = new UserMessageViewModel(message, userVm);
             room.Messages.Add(messageVm);
+            userVm.IsTyping = false;
         }
         private void HandleUserJoiningRoom(RoomViewModel room, User user)
         {
@@ -309,7 +314,7 @@ namespace NabbR.Services
             this.jabbrClient.UserJoined += OnUserJoinedRoom;
             this.jabbrClient.PrivateMessage += OnPrivateMessageReceived;
             
-            foreach (var roomName in logonInfo.Rooms.Select(r => r.Name).OrderBy(r => r))
+            foreach (var roomName in logonInfo.Rooms.Select(r => r.Name))
             {
                 RoomViewModel room = new RoomViewModel { Name = roomName };
                 this.RefreshRoomInfoAsync(room);

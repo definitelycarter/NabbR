@@ -1,21 +1,26 @@
 ﻿using NabbR.Commands;
+using NabbR.Events;
 using NabbR.Services;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+
 namespace NabbR.ViewModels.Chat
 {
     public class LobbyViewModel : ViewModelBase, INavigationAware
     {
-        private LoadingStates loadingState;
         private readonly IJabbRContext jabbrContext;
+        private readonly IEventAggregator eventAggregator;
+
+        private LoadingStates loadingState;
         private IEnumerable<LobbyRoomViewModel> rooms;
         private IDelegateCommand<LobbyRoomViewModel> navigateToRoomCommand;
 
-        public LobbyViewModel(IJabbRContext jabbrContext)
+        public LobbyViewModel(IJabbRContext jabbrContext,
+                              IEventAggregator eventAggregator)
         {
             this.jabbrContext = jabbrContext;
+            this.eventAggregator = eventAggregator;
         }
 
 #if DEBUG
@@ -50,6 +55,7 @@ namespace NabbR.ViewModels.Chat
 
         private void HandleNavigateToRoom(LobbyRoomViewModel room)
         {
+            this.eventAggregator.Publish(new NavigateToRoom { RoomName = room.Name });
         }
 
         async void INavigationAware.Navigated(IDictionary<String, String> parameters)

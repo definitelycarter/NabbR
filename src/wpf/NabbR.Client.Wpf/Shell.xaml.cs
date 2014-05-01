@@ -5,12 +5,13 @@ using NabbR.ViewModels;
 using NabbR.Views;
 using System;
 using System.Linq;
+using System.Windows.Controls;
 
 namespace NabbR.Client
 {
     [View(Shell.Uri)]
     [ViewModel(typeof(ShellViewModel))]
-    partial class Shell : ModernWindow, IHandle<JoinedRoom>, IHandle<LeftRoom>
+    partial class Shell : ModernWindow, IHandle<JoinedRoom>, IHandle<LeftRoom>, IHandle<NavigateToRoom>, IHandle<MessageReceived>
     {
         const String Uri = "/";
 
@@ -47,6 +48,18 @@ namespace NabbR.Client
             var roomUri = String.Format("/chatroom?room={0}", room.Name);
             var link = new RoomLink { RoomName = room.Name, DisplayName = room.Name, Source = new Uri(roomUri, UriKind.RelativeOrAbsolute) };
             this.chatGroup.Links.Add(link);
+        }
+
+        public void Handle(NavigateToRoom message)
+        {
+            var roomUri = String.Format("/chatroom?room={0}", message.RoomName);
+            this.ContentSource = new Uri(roomUri, UriKind.RelativeOrAbsolute);
+        }
+
+        public void Handle(MessageReceived message)
+        {
+            mediaElement.Position = TimeSpan.Zero;
+            mediaElement.Play();
         }
     }
 }

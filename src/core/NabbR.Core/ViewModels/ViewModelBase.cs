@@ -19,7 +19,7 @@ namespace NabbR.ViewModels
             }
             return result;
         }
-        private void RaisePropertyChanged(String propertyName)
+        protected void RaisePropertyChanged(String propertyName)
         {
             var eh = this.PropertyChanged;
             if (eh != null)

@@ -1,5 +1,6 @@
 ﻿using JabbR.Client.Models;
 using System;
+using System.Threading.Tasks;
 
 namespace NabbR.ViewModels.Chat
 {
@@ -31,7 +32,17 @@ namespace NabbR.ViewModels.Chat
         public Boolean IsTyping
         {
             get { return this.isTyping; }
-            set { this.Set(ref this.isTyping, value); }
+            set
+            {
+                if (this.Set(ref this.isTyping, value))
+                {
+                    Task.Delay(TimeSpan.FromSeconds(3)).ContinueWith(_ =>
+                        {
+                            this.isTyping = false;
+                            this.RaisePropertyChanged("IsTyping");
+                        });
+                }
+            }
         }
 
         public String Note

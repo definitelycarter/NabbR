@@ -10,16 +10,14 @@
              xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
              xmlns:controls="clr-namespace:NabbR.Controls"
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
-             mc:Ignorable="d" d:DesignHeight="200"  d:DesignWidth="1000">
+             mc:Ignorable="d">
 
     <UserControl.Resources>
         <chat:MessageContentTemplateSelector x:Key="messageContentTemplateSelector" />
         <chat:MessageTemplateSelector x:Key="messageTemplateSelector">
             <chat:MessageTemplateSelector.NotificationTemplate>
                 <DataTemplate>
-                    <Grid>
-                        <Label Content="{Binding Path=Content}" />
-                    </Grid>
+                    <TextBlock Text="{Binding Path=Content}" />
                 </DataTemplate>
             </chat:MessageTemplateSelector.NotificationTemplate>
             <chat:MessageTemplateSelector.DirectMessageTemplate>
@@ -35,7 +33,7 @@
             </chat:MessageTemplateSelector.ChatRoomMessageTemplate>
         </chat:MessageTemplateSelector>
     </UserControl.Resources>
-    <Grid d:DataContext="{d:DesignInstance Type=vm:ChatRoomViewModel}">
+    <Grid d:DataContext="{d:DesignInstance Type=vm:ChatRoomViewModel, IsDesignTimeCreatable=True}">
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup x:Name="LoadStates">
                 <VisualState x:Name="ChatLoaded" />
@@ -139,13 +137,28 @@
                             <ItemsControl ItemsSource="{Binding Source={StaticResource UsersCollectionViewSource}}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <Grid>
+                                        <Grid Margin="5,0,5,2">
                                             <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="29" />
                                                 <ColumnDefinition />
-                                                <ColumnDefinition Width="Auto" />
                                             </Grid.ColumnDefinitions>
-
-                                            <tmpl:UserTemplate Grid.Column="0" Margin="5,0,5,2" />
+                                            <StackPanel Grid.Column="0" Orientation="Horizontal" Height="24" VerticalAlignment="Top" ToolTip="{Binding Path=Note}">
+                                                <Border Width="5" Background="{Binding Path=Status, Converter={StaticResource userStatusToBrushConverter}}" />
+                                                <Image Width="24">
+                                                    <Image.Style>
+                                                        <Style TargetType="{x:Type Image}">
+                                                            <Setter Property="Source" Value="{Binding Path=Hash, Converter={StaticResource hashToGravatarImageConverter}, ConverterParameter=24, IsAsync=True}" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=DataContext.IsTyping}" Value="True">
+                                                                    <Setter Property="Source" Value="/NabbR;component/Resources/typing-icon-light.png" />
+                                                                    <Setter Property="Margin" Value="1,0,0,0" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Image.Style>
+                                                </Image>
+                                            </StackPanel>
+                                            <TextBlock Grid.Column="1" Text="{Binding Path=Name}" Margin="10,2" />
                                         </Grid>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
