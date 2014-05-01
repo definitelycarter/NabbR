@@ -11,7 +11,7 @@
                 <ResourceDictionary Source="/FirstFloor.ModernUI;component/Assets/ModernUI.Dark.xaml"/>
                 <ResourceDictionary Source="/NabbR;component/Resources/AppResources.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            
+
             <Style TargetType="{x:Type my:Shell}">
                 <Setter Property="ContentLoader" Value="{DynamicResource ContentLoader}" />
             </Style>

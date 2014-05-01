@@ -4,6 +4,10 @@
                     xmlns:converters="clr-namespace:NabbR.Converters"
                     xmlns:corevm="clr-namespace:NabbR.ViewModels;assembly=NabbR.Core">
 
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="/NabbR;component/Resources/ItemsControl.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
     <converters:UserStatusToBrushConverter x:Key="userStatusToBrushConverter" ActiveBrush="#77d42a" InactiveBrush="#fa2" OfflineBrush="Transparent" />
     <converters:HashToGravatarImageConverter x:Key="hashToGravatarImageConverter" />
     

@@ -58,8 +58,7 @@
             <!--Lobby listing-->
             <Grid x:Name="LobbyListing" Grid.Row="1">
                 <Border BorderThickness="1" BorderBrush="{StaticResource InputBorder}">
-                    <ItemsControl ItemsSource="{Binding Source={StaticResource LobbyRoomCollectionViewSource}}"
-                              VirtualizingStackPanel.IsVirtualizing="True" ScrollViewer.CanContentScroll="True">
+                    <ItemsControl Style="{DynamicResource VirtualizingItemsControl}" ItemsSource="{Binding Source={StaticResource LobbyRoomCollectionViewSource}}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <Button Margin="5" HorizontalContentAlignment="Stretch" Focusable="False"
@@ -85,21 +84,6 @@
                                 </Button>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <VirtualizingStackPanel />
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.Template>
-                            <ControlTemplate>
-                                <Border BorderThickness="{TemplateBinding Border.BorderThickness}" Padding="{TemplateBinding Control.Padding}" 
-                                        BorderBrush="{TemplateBinding Border.BorderBrush}" Background="{TemplateBinding Panel.Background}" SnapsToDevicePixels="True">
-                                    <ScrollViewer Padding="{TemplateBinding Control.Padding}" Focusable="False">
-                                        <ItemsPresenter SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}" />
-                                    </ScrollViewer>
-                                </Border>
-                            </ControlTemplate>
-                        </ItemsControl.Template>
                     </ItemsControl>
                 </Border>
             </Grid>
