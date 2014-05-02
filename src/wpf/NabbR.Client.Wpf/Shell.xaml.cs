@@ -48,6 +48,7 @@ namespace NabbR.Client
         {
             base.OnApplyTemplate();
             ModernFrame frame = (ModernFrame)this.Template.FindName("ContentFrame", this);
+            frame.Margin = new Thickness(0);
 
             frame.Navigated += OnNavigated;
             // critical to make navigation work
