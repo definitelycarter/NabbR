@@ -212,7 +212,7 @@ namespace NabbR.Services
 
                     if (room != null)
                     {
-                        this.HandleMessageReceived(message, room);
+                        room.Add(message);
                         this.eventAggregator.Publish(new MessageReceived { RoomName = roomName });
                     }
                 });
@@ -252,7 +252,7 @@ namespace NabbR.Services
 
                             foreach (var message in room.RecentMessages)
                             {
-                                this.HandleMessageReceived(message, roomVm);
+                                roomVm.Add(message);
                             }
 
                             this.eventAggregator.Publish(new JoinedRoom { Room = roomVm });
@@ -260,19 +260,7 @@ namespace NabbR.Services
                         });
                 }, TaskContinuationOptions.OnlyOnRanToCompletion);
         }
-        private void HandleMessageReceived(Message message, RoomViewModel room)
-        {
-            UserViewModel userVm = room.Users.FirstOrDefault(u => u.Name == message.User.Name);
-            if (userVm == null)
-            {
-                userVm = message.User.AsViewModel();
-                userVm.Status = UserStatus.Offline;
-            }
 
-            MessageViewModel messageVm = new UserMessageViewModel(message, userVm);
-            room.Messages.Add(messageVm);
-            userVm.IsTyping = false;
-        }
         private void HandleUserJoiningRoom(RoomViewModel room, User user)
         {
             UserViewModel userVm = room.Users.FirstOrDefault(u => u.Name == user.Name);
@@ -327,21 +315,21 @@ namespace NabbR.Services
             this.jabbrClient.GetRoomInfo(roomViewModel.Name)
                 .ContinueWith(t =>
                 {
-                    Room room = t.Result;
+                    Room roomInfo = t.Result;
                     _synchronizationContext.InvokeIfRequired(() =>
                         {
-                            roomViewModel.Name = room.Name;
-                            roomViewModel.Topic = room.Topic;
-                            roomViewModel.Welcome = room.Welcome;
+                            roomViewModel.Name = roomInfo.Name;
+                            roomViewModel.Topic = roomInfo.Topic;
+                            roomViewModel.Welcome = roomInfo.Welcome;
 
-                            foreach (var user in room.Users)
+                            foreach (var user in roomInfo.Users)
                             {
                                 this.HandleUserJoiningRoom(roomViewModel, user);
                             }
 
-                            foreach (var message in room.RecentMessages)
+                            foreach (var message in roomInfo.RecentMessages)
                             {
-                                this.HandleMessageReceived(message, roomViewModel);
+                                roomViewModel.Add(message);
                             }
                         });
                 }, TaskContinuationOptions.OnlyOnRanToCompletion);

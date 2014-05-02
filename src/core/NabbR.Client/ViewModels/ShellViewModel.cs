@@ -1,25 +1,34 @@
-﻿using NabbR.Security;
+﻿using NabbR.Events;
+using NabbR.Security;
 using NabbR.Services;
 using NabbR.ViewModels.Chat;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 
 namespace NabbR.ViewModels
 {
-    public class ShellViewModel : ViewModelBase, INavigationAware
+    public class ShellViewModel : ViewModelBase, INavigationAware, IHandle<RoomActivated>
     {
+        private RoomViewModel activeRoom;
         private readonly IJabbRContext jabbrContext;
         private readonly ICredentialManager credentialManager;
 
         public ShellViewModel(IJabbRContext jabbrContext,
+                              IEventAggregator eventAggregator,
                               ICredentialManager credentialManager)
         {
             this.jabbrContext = jabbrContext;
             this.credentialManager = credentialManager;
+
+            eventAggregator.Subscribe(this);
         }
 
+        public RoomViewModel ActiveRoom
+        {
+            get { return this.activeRoom; }
+            private set { this.Set(ref this.activeRoom, value); }
+        }
         public IEnumerable<RoomViewModel> Rooms
         {
             get { return this.jabbrContext.Rooms; }
@@ -48,6 +57,11 @@ namespace NabbR.ViewModels
                 }
                 retry++;
             }
+        }
+
+        public void Handle(RoomActivated message)
+        {
+            this.ActiveRoom = message.Room;
         }
     }
 }

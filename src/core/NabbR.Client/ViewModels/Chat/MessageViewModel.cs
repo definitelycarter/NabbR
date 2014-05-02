@@ -9,20 +9,7 @@ namespace NabbR.ViewModels.Chat
         private String content;
         private Boolean isHtmlEncoded;
         private DateTimeOffset messageDateTime;
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MessageViewModel"/> class.
-        /// </summary>
-        /// <param name="message">The message.</param>
-        public MessageViewModel(Message message)
-        {
-            this.content = message.Content;
-            this.messageDateTime = message.When;
-            this.isHtmlEncoded = message.HtmlEncoded;
-        }
-        public MessageViewModel()
-        {
 
-        }
         /// <summary>
         /// Gets the content.
         /// </summary>

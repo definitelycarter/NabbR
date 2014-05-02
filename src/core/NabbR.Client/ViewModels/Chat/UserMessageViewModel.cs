@@ -6,16 +6,6 @@ namespace NabbR.ViewModels.Chat
     {
         private UserViewModel user;
 
-        public UserMessageViewModel(Message message, UserViewModel user)
-            : base(message)
-        {
-            this.user = user;
-        }
-        public UserMessageViewModel()
-        {
-
-        }
-
         public UserViewModel User
         {
             get { return this.user; }

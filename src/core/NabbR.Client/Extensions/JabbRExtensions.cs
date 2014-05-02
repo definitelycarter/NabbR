@@ -35,5 +35,27 @@ namespace NabbR
                 Closed = room.Closed,
             };
         }
+
+        public static MessageViewModel AsViewModel(this Message message)
+        {
+            return new MessageViewModel
+            {
+                Content = message.Content,
+                MessageDateTime = message.When,
+                HtmlEncoded = message.HtmlEncoded,
+            };
+        }
+
+        public static UserMessageViewModel AsUserMessageViewModel(this Message message, UserViewModel user)
+        {
+            return new UserMessageViewModel
+            {
+                User = user,
+                Content = message.Content,
+                MessageDateTime = message.When,
+                HtmlEncoded = message.HtmlEncoded,
+            };
+
+        }
     }
 }

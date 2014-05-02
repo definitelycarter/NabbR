@@ -1,11 +1,14 @@
 ﻿using FirstFloor.ModernUI.Windows.Controls;
+using FirstFloor.ModernUI.Windows.Navigation;
 using NabbR.Controls;
 using NabbR.Events;
 using NabbR.ViewModels;
+using NabbR.ViewModels.Chat;
 using NabbR.Views;
+using NabbR.Views.Chat;
 using System;
 using System.Linq;
-using System.Windows.Controls;
+using System.Windows;
 
 namespace NabbR.Client
 {
@@ -14,11 +17,28 @@ namespace NabbR.Client
     partial class Shell : ModernWindow, IHandle<JoinedRoom>, IHandle<LeftRoom>, IHandle<NavigateToRoom>, IHandle<MessageReceived>
     {
         const String Uri = "/";
+        private ShellViewModel viewModel;
 
         public Shell(IEventAggregator eventAggregator)
+            : this()
+        {
+            eventAggregator.Subscribe(this);
+        }
+        public Shell()
         {
             InitializeComponent();
-            eventAggregator.Subscribe(this);
+            this.DataContextChanged += OnDataContextChanged;
+        }
+
+        public ShellViewModel ViewModel
+        {
+            get { return this.viewModel; }
+            private set { this.viewModel = value; }
+        }
+
+        private void OnDataContextChanged(Object sender, DependencyPropertyChangedEventArgs e)
+        {
+            this.ViewModel = (ShellViewModel)e.NewValue;
         }
 
         /// <summary>
@@ -29,8 +49,19 @@ namespace NabbR.Client
             base.OnApplyTemplate();
             ModernFrame frame = (ModernFrame)this.Template.FindName("ContentFrame", this);
 
+            frame.Navigated += OnNavigated;
             // critical to make navigation work
             frame.KeepContentAlive = false;
+        }
+
+        private void OnNavigated(object sender, NavigationEventArgs e)
+        {
+            var link = this.chatGroup.Links.OfType<RoomLink>().FirstOrDefault(r => r.Source == e.Source);
+
+            if (link != null)
+            {
+                link.UnreadCount = 0;
+            }
         }
 
         public void Handle(LeftRoom message)
@@ -58,6 +89,19 @@ namespace NabbR.Client
 
         public void Handle(MessageReceived message)
         {
+            String roomName = message.RoomName;
+            RoomViewModel activeRoom = this.ViewModel.ActiveRoom;
+
+            if (activeRoom == null ||
+                activeRoom.Name != message.RoomName)
+            {
+                var roomLink = this.chatGroup.Links.OfType<RoomLink>().FirstOrDefault(r => r.RoomName == roomName);
+                if (roomLink != null)
+                {
+                    roomLink.UnreadCount++;
+                }
+            }
+            
             mediaElement.Position = TimeSpan.Zero;
             mediaElement.Play();
         }

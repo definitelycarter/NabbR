@@ -42,6 +42,7 @@
     <Compile Include="Events\LeftRoom.cs" />
     <Compile Include="Events\MessageReceived.cs" />
     <Compile Include="Events\NavigateToRoom.cs" />
+    <Compile Include="Events\RoomActivated.cs" />
     <Compile Include="Extensions\JabbRExtensions.cs" />
     <Compile Include="Services\JabbRContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

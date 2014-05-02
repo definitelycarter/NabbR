@@ -1,6 +1,7 @@
 ﻿using JabbR.Client.Models;
 using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace NabbR.ViewModels.Chat
 {
@@ -43,7 +44,22 @@ namespace NabbR.ViewModels.Chat
         public void AddNotification(String notificationMessage)
         {
             Message message = new Message { Content = notificationMessage, When = DateTime.Now };
-            this.Messages.Add(new MessageViewModel(message));
+            this.Messages.Add(message.AsViewModel());
+        }
+
+        public void Add(Message message)
+        {
+            UserViewModel userVm = this.Users.FirstOrDefault(u => u.Name == message.User.Name);
+            
+            if (userVm == null)
+            {
+                userVm = message.User.AsViewModel();
+                userVm.Status = UserStatus.Offline;
+            }
+
+            MessageViewModel messageVm = message.AsUserMessageViewModel(userVm);
+            this.Messages.Add(messageVm);
+            userVm.IsTyping = false;
         }
     }
 }

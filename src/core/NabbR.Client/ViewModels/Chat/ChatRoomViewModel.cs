@@ -1,4 +1,5 @@
 ﻿using NabbR.Commands;
+using NabbR.Events;
 using NabbR.Services;
 using System;
 using System.Collections.Generic;
@@ -12,16 +13,20 @@ namespace NabbR.ViewModels.Chat
         private RoomViewModel room;
         private String composedMessage;
         private LoadingStates loadingState;
-        private readonly IJabbRContext jabbrContext;
         private IDelegateCommand sendMessageCommand;
+
+        private readonly IJabbRContext jabbrContext;
+        private readonly IEventAggregator eventAggregator;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ChatRoomViewModel"/> class.
         /// </summary>
         /// <param name="jabbrContext">The jabbr context.</param>
-        public ChatRoomViewModel(IJabbRContext jabbrContext)
+        public ChatRoomViewModel(IJabbRContext jabbrContext,
+                                 IEventAggregator eventAggregator)
         {
             this.jabbrContext = jabbrContext;
+            this.eventAggregator = eventAggregator;
         }
 
 #if DEBUG
@@ -101,6 +106,7 @@ namespace NabbR.ViewModels.Chat
 
                 this.LoadingState = LoadingStates.Loaded;
                 this.Room = roomViewModel;
+                this.eventAggregator.Publish(new RoomActivated { Room = roomViewModel });
             }
         }
 

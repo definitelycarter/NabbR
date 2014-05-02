@@ -1,5 +1,5 @@
-﻿
-using System;
+﻿using System;
+
 namespace NabbR.ViewModels.Chat
 {
     public class RoomViewModelBase : ViewModelBase
