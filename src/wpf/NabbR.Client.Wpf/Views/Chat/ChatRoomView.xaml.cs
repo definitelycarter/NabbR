@@ -51,9 +51,9 @@ namespace NabbR.Views.Chat
                 e.Accepted = false;
             }
         }
-        private void ComposeMessageElement_KeyUp(object sender, KeyEventArgs e)
+        private void ComposeMessageElement_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Enter || e.Key == Key.Return)
+            if (e.KeyboardDevice.Modifiers == ModifierKeys.None && (e.Key == Key.Enter || e.Key == Key.Return))
             {
                 ICommand command = this.chatRoom.SendMessageCommand;
 
@@ -61,6 +61,8 @@ namespace NabbR.Views.Chat
                 {
                     command.Execute(null);
                 }
+
+                e.Handled = true;
             }
         }
         private void OnChatRoomPropertyChanged(Object sender, PropertyChangedEventArgs e)

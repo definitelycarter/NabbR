@@ -127,8 +127,8 @@
                                     <ColumnDefinition />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <TextBox x:Name="ComposeMessageElement" Margin="5,0" Text="{Binding Path=ComposedMessage, UpdateSourceTrigger=PropertyChanged}" KeyUp="ComposeMessageElement_KeyUp" />
-                                <Button Grid.Column="1" Content="Send" Command="{Binding Path=SendMessageCommand}" />
+                                <TextBox x:Name="ComposeMessageElement" Margin="5,0" AcceptsReturn="True" Text="{Binding Path=ComposedMessage, UpdateSourceTrigger=PropertyChanged}" PreviewKeyDown="ComposeMessageElement_PreviewKeyDown" />
+                                <Button Grid.Column="1" Content="Send" VerticalAlignment="Bottom" Command="{Binding Path=SendMessageCommand}" />
                             </Grid>
                         </Grid>
                     </Grid>
