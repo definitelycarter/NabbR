@@ -18,7 +18,7 @@
             </Grid.ColumnDefinitions>
             <StackPanel Grid.Column="0" Orientation="Horizontal" Height="24" VerticalAlignment="Top" ToolTip="{Binding Path=Note}">
                 <Border Width="5" Background="{Binding Path=Status, Converter={StaticResource userStatusToBrushConverter}}" />
-                <Image Source="{Binding Path=Hash, Converter={StaticResource hashToGravatarImageConverter}, ConverterParameter=24, IsAsync=True}" Width="24" />
+                <Image Source="{Binding Path=Hash, Converter={StaticResource hashToGravatarImageConverter}, ConverterParameter=96, IsAsync=True}" Width="24" />
             </StackPanel>
             <TextBlock Grid.Column="1" Text="{Binding Path=Name}" Margin="10,2" />
         </Grid>

@@ -48,21 +48,28 @@ namespace NabbR.Controls
             this.Inlines.Clear();
             if (!String.IsNullOrEmpty(this.MessageContent))
             {
-                var split = Regex.Split(this.MessageContent, ChatMessagePattern, RegexOptions.Compiled);
-
-                foreach (var item in split)
+                if (this.MessageContent.IndexOf('\n') == -1)
                 {
-                    var matches = Regex.Matches(item, ChatMessagePattern);
+                    var split = Regex.Split(this.MessageContent, ChatMessagePattern, RegexOptions.Compiled);
 
-                    if (matches.Count == 0)
+                    foreach (var item in split)
                     {
-                        this.Inlines.Add(new Run(item));
+                        var matches = Regex.Matches(item, ChatMessagePattern);
+
+                        if (matches.Count == 0)
+                        {
+                            this.Inlines.Add(new Run(item));
+                        }
+                        else
+                        {
+                            foreach (Match m in matches)
+                                this.AddMatch(m);
+                        }
                     }
-                    else
-                    {
-                        foreach (Match m in matches)
-                            this.AddMatch(m);
-                    }
+                }
+                else
+                {
+                    this.Inlines.Add(new Run(this.MessageContent));
                 }
             }
         }
