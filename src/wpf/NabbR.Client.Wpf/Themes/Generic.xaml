@@ -4,7 +4,7 @@
     
     <Style TargetType="{x:Type local:ChatMessagesControl}">
         <Setter Property="SnapsToDevicePixels" Value="False" />
-        <Setter Property="VirtualizingPanel.CacheLength" Value="5,1" />
+        <Setter Property="VirtualizingPanel.CacheLength" Value="10,15" />
         <Setter Property="VirtualizingPanel.ScrollUnit" Value="Pixel" />
         <Setter Property="ScrollViewer.CanContentScroll" Value="True" />
         <Setter Property="ScrollViewer.PanningMode" Value="VerticalOnly" />

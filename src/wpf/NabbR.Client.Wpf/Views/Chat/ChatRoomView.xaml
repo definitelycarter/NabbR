@@ -146,7 +146,7 @@
                                             <Image Width="24">
                                                 <Image.Style>
                                                     <Style TargetType="{x:Type Image}">
-                                                        <Setter Property="Source" Value="{Binding Path=Hash, Converter={StaticResource hashToGravatarImageConverter}, ConverterParameter=96, IsAsync=True}" />
+                                                        <Setter Property="Source" Value="{Binding Path=Hash, Converter={StaticResource hashToGravatarImageConverter}, ConverterParameter=48, IsAsync=True}" />
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=DataContext.IsTyping}" Value="True">
                                                                 <Setter Property="Source" Value="/NabbR;component/Resources/typing-icon-light.png" />

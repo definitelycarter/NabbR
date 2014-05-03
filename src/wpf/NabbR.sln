@@ -17,9 +17,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NabbR.Client", "..\core\NabbR.Client\NabbR.Client.csproj", "{94AC2E35-759C-4BFF-BD21-628B5ED91E31}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Lib", "Lib", "{8938A938-4D52-4222-9696-134900799265}"
-	ProjectSection(SolutionItems) = preProject
-		NabbR.Client.Wpf\Themes\ItemsControl.xaml = NabbR.Client.Wpf\Themes\ItemsControl.xaml
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
