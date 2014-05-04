@@ -19,8 +19,10 @@ namespace NabbR.Services
         private String username;
         private readonly IJabbRClient jabbrClient;
         private readonly IEventAggregator eventAggregator;
+        private readonly IDependencyResolver dependencyResolver;
         private readonly SynchronizationContext _synchronizationContext = SynchronizationContext.Current;
         private readonly ObservableCollection<RoomViewModel> rooms = new ObservableCollection<RoomViewModel>();
+        private readonly ObservableCollection<DirectMessageRoomViewModel> directMessageRooms = new ObservableCollection<DirectMessageRoomViewModel>();
         /// <summary>
         /// Initializes a new instance of the <see cref="JabbRContext"/> class.
         /// </summary>
@@ -32,13 +34,16 @@ namespace NabbR.Services
         /// eventAggregator
         /// </exception>
         public JabbRContext(IJabbRClient jabbrClient,
-                            IEventAggregator eventAggregator)
+                            IEventAggregator eventAggregator,
+                            IDependencyResolver dependencyResolver)
         {
             if (jabbrClient == null) throw new ArgumentNullException("jabbrClient");
             if (eventAggregator == null) throw new ArgumentNullException("eventAggregator");
+            if (dependencyResolver == null) throw new ArgumentNullException("dependencyResolver");
 
             this.jabbrClient = jabbrClient;
             this.eventAggregator = eventAggregator;
+            this.dependencyResolver = dependencyResolver;
         }
 
         String IJabbRContext.UserId
@@ -58,6 +63,11 @@ namespace NabbR.Services
         IEnumerable<RoomViewModel> IJabbRContext.Rooms
         {
             get { return this.rooms; }
+        }
+
+        IEnumerable<DirectMessageRoomViewModel> IJabbRContext.DirectMessageRooms
+        {
+            get { return this.directMessageRooms; }
         }
         /// <summary>
         /// Logs in the user.
@@ -130,6 +140,7 @@ namespace NabbR.Services
         {
             return this.jabbrClient.Send(message, roomName);
         }
+
 
         #region JabbR Events
         private void OnUserActivityChanged(User user)
@@ -229,11 +240,73 @@ namespace NabbR.Services
                 }
             });
         }
-        private void OnPrivateMessageReceived(String from, String to, String message)
+        private async void OnPrivateMessageReceived(String from, String to, String message)
         {
+            DirectMessageRoomViewModel vm = this.directMessageRooms.FirstOrDefault(dm => dm.From.Name == from);
 
+            if (vm == null)
+            {
+                var directMessageRoom = await this.InitializeDirectMessageRoom(from, to);
+                this.directMessageRooms.Add(directMessageRoom);
+            }
+
+            _synchronizationContext.InvokeIfRequired(() =>
+            {
+                this.eventAggregator.Publish(new DirectMessageReceived
+                {
+                    To = to,
+                    From = from,
+                    Message = message
+                });
+            });
         }
         #endregion
+
+        private async Task<DirectMessageRoomViewModel> InitializeDirectMessageRoom(String from, String to)
+        {
+            UserViewModel userTo = null;
+            UserViewModel userFrom = null;
+            
+            foreach (var room in this.rooms)
+            {
+                foreach (var user in room.Users)
+                {
+                    if (user.Name == from)
+                    {
+                        userFrom = user;
+                    }
+                    else if (user.Name == to)
+                    {
+                        userTo = user;
+                    }
+                }
+
+                if (userTo != null && userFrom != null)
+                {
+                    break;
+                }
+            }
+
+            if (userTo == null)
+            {
+                userTo = await this.GetUserInfo(to, CancellationToken.None);
+            };
+            if (userFrom == null)
+            {
+                userFrom = await this.GetUserInfo(from, CancellationToken.None);
+            }
+
+            var vm = this.dependencyResolver.Get<DirectMessageRoomViewModel>();
+            vm.From = userFrom;
+            vm.To = userTo;
+            return vm;
+        }
+
+        private async Task<UserViewModel> GetUserInfo(String username, CancellationToken token)
+        {
+            var user = await this.jabbrClient.GetUserInfo(username, token);
+            return user.AsViewModel();
+        }
 
         private Task HandleRoomJoined(Room roomInfo)
         {
@@ -243,20 +316,24 @@ namespace NabbR.Services
                     _synchronizationContext.InvokeIfRequired(() =>
                         {
                             var room = t.Result;
-                            RoomViewModel roomVm = room.AsViewModel();
+                            var roomViewModel = dependencyResolver.Get<RoomViewModel>();
+
+                            roomViewModel.Name = room.Name;
+                            roomViewModel.Topic = room.Topic;
+                            roomViewModel.Welcome = room.Welcome;
 
                             foreach (var user in room.Users)
                             {
-                                this.HandleUserJoiningRoom(roomVm, user);
+                                this.HandleUserJoiningRoom(roomViewModel, user);
                             }
 
                             foreach (var message in room.RecentMessages)
                             {
-                                roomVm.Add(message);
+                                roomViewModel.Add(message);
                             }
 
-                            this.eventAggregator.Publish(new JoinedRoom { Room = roomVm });
-                            this.rooms.Add(roomVm);
+                            this.eventAggregator.Publish(new JoinedRoom { Room = roomViewModel });
+                            this.rooms.Add(roomViewModel);
                         });
                 }, TaskContinuationOptions.OnlyOnRanToCompletion);
         }
@@ -285,6 +362,7 @@ namespace NabbR.Services
             this.jabbrClient.UserLeft -= OnUserLeftRoom;
             this.jabbrClient.UserJoined -= OnUserJoinedRoom;
             this.jabbrClient.PrivateMessage -= OnPrivateMessageReceived;
+
             this.rooms.Clear();
         }
         private async Task LoginUser(LogOnInfo logonInfo)
@@ -301,10 +379,12 @@ namespace NabbR.Services
             this.jabbrClient.UserLeft += OnUserLeftRoom;
             this.jabbrClient.UserJoined += OnUserJoinedRoom;
             this.jabbrClient.PrivateMessage += OnPrivateMessageReceived;
-            
+
             foreach (var roomName in logonInfo.Rooms.Select(r => r.Name))
             {
-                RoomViewModel room = new RoomViewModel { Name = roomName };
+                RoomViewModel room = this.dependencyResolver.Get<RoomViewModel>();
+                room.Name = roomName;
+
                 this.RefreshRoomInfoAsync(room);
                 this.rooms.Add(room);
                 this.eventAggregator.Publish(new JoinedRoom { Room = room });

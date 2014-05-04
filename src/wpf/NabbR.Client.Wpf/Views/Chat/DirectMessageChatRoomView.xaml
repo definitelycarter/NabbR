@@ -1,0 +1,10 @@
+﻿<UserControl x:Class="NabbR.Views.Chat.DirectMessageChatRoomView"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:chatvm="clr-namespace:NabbR.ViewModels.Chat;assembly=NabbR.Client"
+             mc:Ignorable="d">
+    <Grid d:DataContext="{d:DesignInstance Type=chatvm:DirectMessageChatRoomViewModel, IsDesignTimeCreatable=True}">
+    </Grid>
+</UserControl>

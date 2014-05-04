@@ -183,6 +183,11 @@
                 <mui:Link DisplayName="Lobby" Source="/chat/lobby" />
             </mui:LinkGroup.Links>
         </mui:LinkGroup>
+        <mui:LinkGroup x:Name="directMessageGroup" DisplayName="Direct Messages">
+            <mui:LinkGroup.Links>
+                <!--<mui:Link DisplayName="davepermen.net" />-->
+            </mui:LinkGroup.Links>
+        </mui:LinkGroup>
     </mui:ModernWindow.MenuLinkGroups>
     <MediaElement x:Name="mediaElement" Source="http://jabbr.net/content/sounds/notification.wav" LoadedBehavior="Manual" UnloadedBehavior="Manual" Volume="1" />
 </mui:ModernWindow>

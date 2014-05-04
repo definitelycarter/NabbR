@@ -1,13 +1,17 @@
 ﻿using JabbR.Client.Models;
+using NabbR.Services;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace NabbR.ViewModels.Chat
 {
-    public class RoomViewModel : RoomViewModelBase
+    public class RoomViewModel : PublicRoomViewModel, IRoom
     {
         private String welcome;
+
+        private readonly IJabbRContext jabbrContext;
         private readonly ObservableCollection<UserViewModel> users;
         private readonly ObservableCollection<MessageViewModel> messages;
 
@@ -18,6 +22,11 @@ namespace NabbR.ViewModels.Chat
         {
             this.users = new ObservableCollection<UserViewModel>();
             this.messages = new ObservableCollection<MessageViewModel>();
+        }
+        public RoomViewModel(IJabbRContext jabbrContext)
+            : this()
+        {
+            this.jabbrContext = jabbrContext;
         }
 
         /// <summary>
@@ -50,16 +59,24 @@ namespace NabbR.ViewModels.Chat
         public void Add(Message message)
         {
             UserViewModel userVm = this.Users.FirstOrDefault(u => u.Name == message.User.Name);
-            
+
             if (userVm == null)
             {
                 userVm = message.User.AsViewModel();
                 userVm.Status = UserStatus.Offline;
             }
 
-            MessageViewModel messageVm = message.AsUserMessageViewModel(userVm);
+            UserMessageViewModel messageVm = message.AsUserMessageViewModel(userVm);
+            messageVm.IsSelf = userVm.Name == this.jabbrContext.Username;
+            
             this.Messages.Add(messageVm);
             userVm.IsTyping = false;
+        }
+
+
+        public Task<Boolean> SendMessage(String message)
+        {
+            return this.jabbrContext.SendMessage(message, this.Name);
         }
     }
 }

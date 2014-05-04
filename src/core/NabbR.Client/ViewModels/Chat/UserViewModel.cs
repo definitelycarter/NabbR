@@ -17,18 +17,16 @@ namespace NabbR.ViewModels.Chat
             get { return this.name; }
             set { this.Set(ref this.name, value); }
         }
-
         public String Hash
         {
             get { return this.hash; }
             set { this.Set(ref this.hash, value); }
         }
-        public UserStatus Status
+        public String Note
         {
-            get { return this.userStatus; }
-            set { this.Set(ref this.userStatus, value); }
+            get { return this.note; }
+            set { this.Set(ref this.note, value); }
         }
-
         public Boolean IsTyping
         {
             get { return this.isTyping; }
@@ -37,18 +35,17 @@ namespace NabbR.ViewModels.Chat
                 if (this.Set(ref this.isTyping, value))
                 {
                     Task.Delay(TimeSpan.FromSeconds(3)).ContinueWith(_ =>
-                        {
-                            this.isTyping = false;
-                            this.RaisePropertyChanged("IsTyping");
-                        });
+                    {
+                        this.isTyping = false;
+                        this.RaisePropertyChanged("IsTyping");
+                    });
                 }
             }
         }
-
-        public String Note
+        public UserStatus Status
         {
-            get { return this.note; }
-            set { this.Set(ref this.note, value); }
+            get { return this.userStatus; }
+            set { this.Set(ref this.userStatus, value); }
         }
     }
 }

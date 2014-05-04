@@ -119,6 +119,7 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\DirectMessageLink.cs" />
     <Compile Include="Controls\NabbrTextBlock.cs" />
     <Compile Include="Controls\ChatMessagesControl.cs" />
     <Compile Include="Controls\RoomLink.cs" />
@@ -148,6 +149,9 @@
     </Compile>
     <Compile Include="Views\Chat\ChatRoomView.xaml.cs">
       <DependentUpon>ChatRoomView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Chat\DirectMessageChatRoomView.xaml.cs">
+      <DependentUpon>DirectMessageChatRoomView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Chat\LobbyView.xaml.cs">
       <DependentUpon>LobbyView.xaml</DependentUpon>
@@ -199,6 +203,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Chat\ChatRoomView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Chat\DirectMessageChatRoomView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

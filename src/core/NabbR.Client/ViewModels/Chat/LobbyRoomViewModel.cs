@@ -2,7 +2,7 @@
 
 namespace NabbR.ViewModels.Chat
 {
-    public class LobbyRoomViewModel : RoomViewModelBase
+    public class LobbyRoomViewModel : PublicRoomViewModel
     {
         private Int32 count;
         private Boolean closed;

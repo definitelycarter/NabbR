@@ -25,6 +25,7 @@ namespace NabbR.Services
         /// The rooms.
         /// </value>
         IEnumerable<RoomViewModel> Rooms { get; }
+        IEnumerable<DirectMessageRoomViewModel> DirectMessageRooms { get; }
         Task SetTyping(String roomName);
         Task<RoomViewModel> JoinRoom(String roomName);
         Task<IEnumerable<LobbyRoomViewModel>> GetLobbyRooms();

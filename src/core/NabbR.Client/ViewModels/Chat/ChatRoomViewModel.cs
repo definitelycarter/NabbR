@@ -4,16 +4,14 @@ using NabbR.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Input;
 
 namespace NabbR.ViewModels.Chat
 {
-    public class ChatRoomViewModel : ViewModelBase, INavigationAware
+    public class ChatRoomViewModel : ChatRoomViewModelBase<RoomViewModel>, INavigationAware
     {
         private RoomViewModel room;
         private String composedMessage;
         private LoadingStates loadingState;
-        private IDelegateCommand sendMessageCommand;
 
         private readonly IJabbRContext jabbrContext;
         private readonly IEventAggregator eventAggregator;
@@ -24,6 +22,7 @@ namespace NabbR.ViewModels.Chat
         /// <param name="jabbrContext">The jabbr context.</param>
         public ChatRoomViewModel(IJabbRContext jabbrContext,
                                  IEventAggregator eventAggregator)
+            : base(jabbrContext)
         {
             this.jabbrContext = jabbrContext;
             this.eventAggregator = eventAggregator;
@@ -31,6 +30,7 @@ namespace NabbR.ViewModels.Chat
 
 #if DEBUG
         public ChatRoomViewModel()
+            : base(null)
         {
             this.Room = new RoomViewModel
             {
@@ -39,7 +39,7 @@ namespace NabbR.ViewModels.Chat
                 Welcome = "This is a design-time room welcome message.",
             };
 
-            this.Room.Users.Add(new UserViewModel{ Name = "definitelycarter", IsTyping = true, Hash = "0ca89936b4a526bc1ee7ad4c5eb6fcbe", Status = JabbR.Client.Models.UserStatus.Inactive});
+            this.Room.Users.Add(new UserViewModel { Name = "definitelycarter", IsTyping = true, Hash = "0ca89936b4a526bc1ee7ad4c5eb6fcbe", Status = JabbR.Client.Models.UserStatus.Inactive });
             this.Room.Users.Add(new UserViewModel { Name = "davepermen.net", IsTyping = false, Hash = "6ad5f8c742f1e8ec61000e2b0900fc76", Status = JabbR.Client.Models.UserStatus.Active });
 
             this.Room.Messages.Add(new Chat.UserMessageViewModel { User = this.Room.Users[0], Content = "This is a design-time message!", MessageDateTime = DateTimeOffset.Now });
@@ -48,45 +48,26 @@ namespace NabbR.ViewModels.Chat
         }
 #endif
 
-        public RoomViewModel Room
-        {
-            get { return this.room; }
-            private set { this.Set(ref this.room, value); }
-        }
-
-        public IDelegateCommand SendMessageCommand
-        {
-            get { return this.sendMessageCommand ?? (this.sendMessageCommand = new DelegateCommand(() => this.HandleSendMessage(), () => this.CanSendMessage())); }
-        }
-
-        public String ComposedMessage
-        {
-            get { return this.composedMessage; }
-            set
-            {
-                if (this.Set(ref this.composedMessage, value))
-                {
-                    this.SendMessageCommand.RaiseCanExecuteChanged();
-                    this.NotifyTyping();
-                }
-            }
-        }
-
         public LoadingStates LoadingState
         {
             get { return this.loadingState; }
             set { this.Set(ref this.loadingState, value); }
         }
 
-        private void HandleSendMessage()
+        public override String ComposedMessage
         {
-            this.jabbrContext.SendMessage(composedMessage, this.room.Name);
-            this.ComposedMessage = null;
+            get { return base.ComposedMessage; }
+            set
+            {
+                base.ComposedMessage = value;
+
+                if (value != null)
+                {
+                    this.NotifyTyping();
+                }
+            }
         }
-        private Boolean CanSendMessage()
-        {
-            return !String.IsNullOrWhiteSpace(this.ComposedMessage);
-        }
+
         /// <summary>
         /// Called when navigated.
         /// </summary>

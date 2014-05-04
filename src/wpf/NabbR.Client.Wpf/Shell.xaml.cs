@@ -14,7 +14,7 @@ namespace NabbR.Client
 {
     [View(Shell.Uri)]
     [ViewModel(typeof(ShellViewModel))]
-    partial class Shell : ModernWindow, IHandle<JoinedRoom>, IHandle<LeftRoom>, IHandle<NavigateToRoom>, IHandle<MessageReceived>
+    partial class Shell : ModernWindow, IHandle<JoinedRoom>, IHandle<LeftRoom>, IHandle<NavigateToRoom>, IHandle<MessageReceived>, IHandle<DirectMessageReceived>
     {
         const String Uri = "/";
         private ShellViewModel viewModel;
@@ -101,9 +101,21 @@ namespace NabbR.Client
                     roomLink.UnreadCount++;
                 }
             }
-            
+
             mediaElement.Position = TimeSpan.Zero;
             mediaElement.Play();
+        }
+
+        public void Handle(DirectMessageReceived message)
+        {
+            var link = this.directMessageGroup.Links.OfType<DirectMessageLink>().FirstOrDefault(l => l.Username == message.From);
+
+            if (link == null)
+            {
+                String uri = String.Format("/directmessage?username={0}", message.From);
+                link = new DirectMessageLink { Username = message.From, Source = new Uri(uri, UriKind.RelativeOrAbsolute) };
+                this.directMessageGroup.Links.Add(link);
+            }
         }
     }
 }

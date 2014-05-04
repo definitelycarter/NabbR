@@ -23,10 +23,6 @@
             <TextBlock Grid.Column="1" Text="{Binding Path=Name}" Margin="10,2" />
         </Grid>
         <Grid Grid.Column="1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
             <controls:NabbrTextBlock MessageContent="{Binding Path=Content}" TextWrapping="Wrap" />
         </Grid>
     </Grid>
