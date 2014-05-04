@@ -184,9 +184,14 @@
             <param name="value">The value to serialize.</param>
             <returns>A task that represents when the data has been sent.</returns>
         </member>
-        <member name="M:Microsoft.AspNet.SignalR.Client.Connection.Microsoft#AspNet#SignalR#Client#IConnection#UpdateLastKeepAlive">
+        <member name="M:Microsoft.AspNet.SignalR.Client.Connection.Microsoft#AspNet#SignalR#Client#IConnection#MarkLastMessage">
             <summary>
-            Sets LastKeepAlive to the current time 
+            Sets LastMessageAt to the current time 
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNet.SignalR.Client.Connection.Microsoft#AspNet#SignalR#Client#IConnection#MarkActive">
+            <summary>
+            Sets LastActiveAt to the current time 
             </summary>
         </member>
         <member name="M:Microsoft.AspNet.SignalR.Client.Connection.Dispose">
@@ -241,9 +246,26 @@
             This value is modified by adding the server's TransportConnectTimeout configuration value.
             </summary>
         </member>
+        <member name="P:Microsoft.AspNet.SignalR.Client.Connection.Microsoft#AspNet#SignalR#Client#IConnection#TotalTransportConnectTimeout">
+            <summary>
+            The amount of time a transport will wait (while connecting) before failing.
+            This is the total vaue obtained by adding the server's configuration value and the timeout specified by the user
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNet.SignalR.Client.Connection.Microsoft#AspNet#SignalR#Client#IConnection#ReconnectWindow">
+            <summary>
+            The maximum amount of time a connection will allow to try and reconnect.
+            This value is equivalent to the summation of the servers disconnect and keep alive timeout values.
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNet.SignalR.Client.Connection.Microsoft#AspNet#SignalR#Client#IConnection#KeepAliveData">
             <summary>
             Object to store the various keep alive timeout values
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNet.SignalR.Client.Connection.Microsoft#AspNet#SignalR#Client#IConnection#LastMessageAt">
+            <summary>
+            The timestamp of the last message received by the connection.
             </summary>
         </member>
         <member name="P:Microsoft.AspNet.SignalR.Client.Connection.JsonSerializer">
@@ -311,16 +333,17 @@
             Default text writer
             </summary>
         </member>
-        <member name="M:Microsoft.AspNet.SignalR.Client.HeartbeatMonitor.#ctor(Microsoft.AspNet.SignalR.Client.IConnection,System.Object)">
+        <member name="M:Microsoft.AspNet.SignalR.Client.HeartbeatMonitor.#ctor(Microsoft.AspNet.SignalR.Client.IConnection,System.Object,System.TimeSpan)">
             <summary>
             Initializes a new instance of the HeartBeatMonitor Class 
             </summary>
             <param name="connection"></param>
             <param name="connectionStateLock"></param>
+            <param name="beatInterval">How often to check connection status</param>
         </member>
         <member name="M:Microsoft.AspNet.SignalR.Client.HeartbeatMonitor.Start">
             <summary>
-            Updates LastKeepAlive and starts the timer
+            Starts the timer that triggers heartbeats  
             </summary>
         </member>
         <member name="M:Microsoft.AspNet.SignalR.Client.HeartbeatMonitor.Beat">
@@ -459,6 +482,16 @@
             <param name="onData">The callback</param>
             <returns>An <see cref="T:System.IDisposable"/> that represents this subscription.</returns>
         </member>
+        <member name="P:Microsoft.AspNet.SignalR.Client.Hubs.HubProgressUpdate.Id">
+            <summary>
+            The callback identifier
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNet.SignalR.Client.Hubs.HubProgressUpdate.Data">
+            <summary>
+            The progress value
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNet.SignalR.Client.IHubProxy">
             <summary>
              A client side proxy for a server side hub.
@@ -476,8 +509,28 @@
             <summary>
             Executes a method on the server side hub asynchronously.
             </summary>
-            <typeparam name="T">The type of result returned from the hub</typeparam>
+            <typeparam name="T">The type of result returned from the hub.</typeparam>
             <param name="method">The name of the method.</param>
+            <param name="args">The arguments</param>
+            <returns>A task that represents when invocation returned.</returns>
+        </member>
+        <member name="M:Microsoft.AspNet.SignalR.Client.IHubProxy.Invoke``1(System.String,System.Action{``0},System.Object[])">
+            <summary>
+            Executes a method on the server side hub asynchronously with progress updates.
+            </summary>
+            <param name="method">The name of the method.</param>
+            <param name="onProgress">The callback to invoke when progress updates are received.</param>
+            <param name="args">The arguments</param>
+            <returns>A task that represents when invocation returned.</returns>
+        </member>
+        <member name="M:Microsoft.AspNet.SignalR.Client.IHubProxy.Invoke``2(System.String,System.Action{``1},System.Object[])">
+            <summary>
+            Executes a method on the server side hub asynchronously with progress updates.
+            </summary>
+            <typeparam name="TResult">The type of result returned from the hub.</typeparam>
+            <typeparam name="TProgress">The type of progress update value.</typeparam>
+            <param name="method">The name of the method.</param>
+            <param name="onProgress">The callback to invoke when progress updates are received.</param>
             <param name="args">The arguments</param>
             <returns>A task that represents when invocation returned.</returns>
         </member>
@@ -508,6 +561,11 @@
         <member name="P:Microsoft.AspNet.SignalR.Client.Hubs.HubResult.Id">
             <summary>
             The callback identifier
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNet.SignalR.Client.Hubs.HubResult.ProgressUpdate">
+            <summary>
+            The progress update of the invocation
             </summary>
         </member>
         <member name="P:Microsoft.AspNet.SignalR.Client.Hubs.HubResult.Result">
@@ -637,7 +695,12 @@
         </member>
         <member name="P:Microsoft.AspNet.SignalR.Client.Resources.Error_DataCannotBeSentConnectionDisconnected">
             <summary>
-              Looks up a localized string similar to Data cannot be sent as connection is disconnected. Call start before sending any data..
+              Looks up a localized string similar to Data cannot be sent because the connection is in the disconnected state. Call start before sending any data..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNet.SignalR.Client.Resources.Error_DataCannotBeSentDuringWebSocketReconnect">
+            <summary>
+              Looks up a localized string similar to Data cannot be sent because the WebSocket connection is reconnecting..
             </summary>
         </member>
         <member name="P:Microsoft.AspNet.SignalR.Client.Resources.Error_IncompatibleProtocolVersion">
