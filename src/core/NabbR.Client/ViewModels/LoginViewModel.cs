@@ -11,15 +11,12 @@ namespace NabbR.ViewModels
         private String password;
         private Boolean isLoggingIn;
         private IDelegateCommand loginCommand;
-        private readonly IJabbRContext jabbrContext;
 
         /// <summary>
         /// Creates a new instance of a <see cref="LoginViewModel" />.
         /// </summary>
-        /// <param name="jabbrContext">The jabbr context.</param>
-        public LoginViewModel(IJabbRContext jabbrContext)
+        public LoginViewModel()
         {
-            this.jabbrContext = jabbrContext;
         }
 
         /// <summary>

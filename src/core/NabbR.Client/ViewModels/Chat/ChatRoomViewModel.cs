@@ -9,11 +9,8 @@ namespace NabbR.ViewModels.Chat
 {
     public class ChatRoomViewModel : ChatRoomViewModelBase<RoomViewModel>, INavigationAware
     {
-        private RoomViewModel room;
-        private String composedMessage;
         private LoadingStates loadingState;
 
-        private readonly IJabbRContext jabbrContext;
         private readonly IEventAggregator eventAggregator;
 
         /// <summary>
@@ -24,7 +21,6 @@ namespace NabbR.ViewModels.Chat
                                  IEventAggregator eventAggregator)
             : base(jabbrContext)
         {
-            this.jabbrContext = jabbrContext;
             this.eventAggregator = eventAggregator;
         }
 

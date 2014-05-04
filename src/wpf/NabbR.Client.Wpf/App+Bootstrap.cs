@@ -28,7 +28,7 @@ namespace NabbR.Client
             resolver = new NinjectDependencyResolver(kernel);
             kernel.Bind<IDependencyResolver>().ToMethod(_ => resolver);
 
-            var viewLocater = new ViewLocater(resolver, assemblies);
+            var viewLocater = new ViewLocater(assemblies);
             kernel.Bind<ViewLocater>().ToMethod(_ => viewLocater);
 
             var contentLoader = new NinjectContentLoader(viewLocater, resolver);

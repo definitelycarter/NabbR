@@ -9,13 +9,11 @@ namespace NabbR.Views
 {
     public class ViewLocater
     {
-        private readonly IDependencyResolver resolver;
         private readonly IEnumerable<Assembly> assemblies;
         private readonly IDictionary<String, TypeInfo> registeredViews;
 
-        public ViewLocater(IDependencyResolver resolver, IEnumerable<Assembly> assemblies)
+        public ViewLocater(IEnumerable<Assembly> assemblies)
         {
-            this.resolver = resolver;
             this.assemblies = assemblies;
 
             IEnumerable<TypeInfo> types = assemblies.SelectMany(a => a.DefinedTypes).ToArray();
