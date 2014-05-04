@@ -7,7 +7,6 @@ namespace NabbR.ViewModels.Chat
     public class MessageViewModel : ViewModelBase
     {
         private String content;
-        private Boolean isHtmlEncoded;
         private DateTimeOffset messageDateTime;
 
         /// <summary>
@@ -31,11 +30,6 @@ namespace NabbR.ViewModels.Chat
         {
             get { return this.messageDateTime; }
             set { this.Set(ref this.messageDateTime, value); }
-        }
-        public Boolean HtmlEncoded
-        {
-            get { return this.isHtmlEncoded; }
-            set { this.Set(ref this.isHtmlEncoded, value); }
         }
     }
 }

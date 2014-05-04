@@ -42,7 +42,6 @@ namespace NabbR
             {
                 Content = message.Content,
                 MessageDateTime = message.When,
-                HtmlEncoded = message.HtmlEncoded,
             };
         }
 
@@ -53,7 +52,6 @@ namespace NabbR
                 User = user,
                 Content = message.Content,
                 MessageDateTime = message.When,
-                HtmlEncoded = message.HtmlEncoded,
             };
 
         }
