@@ -40,6 +40,8 @@ namespace NabbR.ViewModels.Chat
 
             this.Room.Messages.Add(new Chat.UserMessageViewModel { User = this.Room.Users[0], Content = "This is a design-time message!", MessageDateTime = DateTimeOffset.Now });
             this.Room.Messages.Add(new Chat.UserMessageViewModel { User = this.Room.Users[1], Content = "That message is really cool!", MessageDateTime = DateTimeOffset.Now });
+            (this.Room.Messages[1] as UserMessageViewModel).Messages.Add(new MessageViewModel { Content = "This is a second message, neat!", MessageDateTime = DateTimeOffset.Now.AddMinutes(5) });
+
             this.Room.Messages.Add(new Chat.MessageViewModel { Content = "bryan_the_bot as become inactive.", MessageDateTime = DateTime.Now });
         }
 #endif

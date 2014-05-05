@@ -62,7 +62,7 @@ namespace NabbR.Controls
                     {
                         if (match.Index > start)
                         {
-                            this.Inlines.Add(new Run(this.MessageContent.Substring(start, match.Index)));
+                            this.Inlines.Add(new Run(this.MessageContent.Substring(start, (match.Index - start))));
                             start = match.Index;
                         }
 

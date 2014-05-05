@@ -10,7 +10,7 @@
              xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
              xmlns:controls="clr-namespace:NabbR.Controls"
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
-             mc:Ignorable="d">
+             mc:Ignorable="d" d:DesignWidth="800">
 
     <UserControl.Resources>
         <chat:MessageContentTemplateSelector x:Key="messageContentTemplateSelector" />
@@ -28,7 +28,59 @@
             </chat:MessageTemplateSelector.DirectMessageTemplate>
             <chat:MessageTemplateSelector.ChatRoomMessageTemplate>
                 <DataTemplate>
-                    <tmpl:ChatMessageTemplate />
+                    <Border BorderBrush="{StaticResource ItemBackgroundHover}" BorderThickness="0,0,0,0.5">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="160" />
+                                <ColumnDefinition />
+                                <ColumnDefinition Width="100" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <Grid Grid.Row="0" Grid.RowSpan="2" DataContext="{Binding Path=User}" Margin="2,2,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Orientation="Horizontal" Height="24" VerticalAlignment="Top" ToolTip="{Binding Path=Note}">
+                                    <Border Width="5" Background="{Binding Path=Status, Converter={StaticResource userStatusToBrushConverter}}" />
+                                    <Image Source="{Binding Path=Hash, Converter={StaticResource hashToGravatarImageConverter}, ConverterParameter=48, IsAsync=True}" Width="24" />
+                                </StackPanel>
+                                <TextBlock Grid.Column="1" Text="{Binding Path=Name}" Margin="10,0,0,0" />
+                            </Grid>
+                            <Border Grid.RowSpan="2" Grid.Column="1" BorderBrush="{StaticResource ItemBackgroundHover}" BorderThickness="0.5,0,0,0">
+                                <controls:NabbrTextBlock Grid.Column="1" Margin="2"
+                                                         MessageContent="{Binding Path=Content}" TextWrapping="Wrap" />
+                            </Border>
+                            <Border Grid.Column="2" BorderBrush="{StaticResource ItemBackgroundHover}" BorderThickness="0.5,0,0,0">
+                                <TextBlock Margin="2" HorizontalAlignment="Right" Text="{Binding Path=MessageDateTime, StringFormat=\{0:h:mm:ss tt\}}" />
+                            </Border>
+                            <ItemsControl Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" ItemsSource="{Binding Path=Messages}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border BorderBrush="{StaticResource ItemBackgroundHover}" BorderThickness="0.5,0.5,0,0">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition />
+                                                    <ColumnDefinition Width="100" />
+                                                </Grid.ColumnDefinitions>
+                                                <Border Grid.Column="0">
+                                                    <controls:NabbrTextBlock Grid.Column="1" Margin="2"
+                                                                             MessageContent="{Binding Path=Content}" TextWrapping="Wrap" />
+                                                </Border>
+                                                <Border Grid.Column="1" BorderBrush="{StaticResource ItemBackgroundHover}" BorderThickness="0.5,0,0,0">
+                                                    <TextBlock Margin="2" HorizontalAlignment="Right" Text="{Binding Path=MessageDateTime, StringFormat=\{0:h:mm:ss tt\}}" />
+                                                </Border>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Grid>
+                    </Border>
                 </DataTemplate>
             </chat:MessageTemplateSelector.ChatRoomMessageTemplate>
         </chat:MessageTemplateSelector>
@@ -84,7 +136,7 @@
             </Grid.RowDefinitions>
 
             <Grid Grid.Row="0">
-                <TextBlock Background="{StaticResource WindowBorder}" FontWeight="Normal" Padding="0 4" Text="{Binding Path=Room.Topic}" />
+                <TextBlock Background="{StaticResource AccentBrush}" FontWeight="Normal" Padding="0 4" Text="{Binding Path=Room.Topic}" />
             </Grid>
             <Border Grid.Row="1">
                 <Grid>
@@ -98,28 +150,9 @@
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
 
-                        <Grid Grid.Row="0">
-                            <controls:ChatMessagesControl x:Name="ChatMessageControl" ItemsSource="{Binding Path=Room.Messages}">
-                                <controls:ChatMessagesControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Border Margin="5,0,5,2">
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition />
-                                                    <ColumnDefinition Width="100" />
-                                                </Grid.ColumnDefinitions>
-                                                <ContentControl Grid.Column="0"
-                                                Content="{Binding}"
-                                                HorizontalAlignment="Stretch"
-                                                HorizontalContentAlignment="Stretch"
-                                                ContentTemplateSelector="{StaticResource messageTemplateSelector}" />
-                                                <TextBlock Grid.Column="1" HorizontalAlignment="Right" Text="{Binding Path=MessageDateTime, StringFormat=\{0:h:mm:ss tt\}}" />
-                                            </Grid>
-                                        </Border>
-                                    </DataTemplate>
-                                </controls:ChatMessagesControl.ItemTemplate>
-                            </controls:ChatMessagesControl>
-                        </Grid>
+                        <controls:ChatMessagesControl Grid.Row="0" x:Name="ChatMessageControl" 
+                                                      ItemsSource="{Binding Path=Room.Messages}" 
+                                                      ItemTemplateSelector="{StaticResource messageTemplateSelector}" />
 
                         <Grid Grid.Row="1" FocusManager.FocusedElement="{Binding ElementName=ComposeMessageElement}">
                             <Grid Margin="0,5">

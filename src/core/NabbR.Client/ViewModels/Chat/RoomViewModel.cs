@@ -58,19 +58,33 @@ namespace NabbR.ViewModels.Chat
 
         public void Add(Message message)
         {
-            UserViewModel userVm = this.Users.FirstOrDefault(u => u.Name == message.User.Name);
+            UserViewModel user = this.EnsureUser(message.User);
+
+            UserMessageViewModel lastUserMessage = this.Messages.LastOrDefault() as UserMessageViewModel;
+            if (lastUserMessage != null && lastUserMessage.User.Name == user.Name)
+            {
+                lastUserMessage.Messages.Add(message.AsViewModel());
+            }
+            else
+            {
+                UserMessageViewModel messageVm = message.AsUserMessageViewModel(user);
+                messageVm.IsSelf = user.Name == this.jabbrContext.Username;
+                this.Messages.Add(messageVm);
+            }
+            user.IsTyping = false;
+        }
+
+        private UserViewModel EnsureUser(User user)
+        {
+            UserViewModel userVm = this.Users.FirstOrDefault(u => u.Name == user.Name);
 
             if (userVm == null)
             {
-                userVm = message.User.AsViewModel();
+                userVm = user.AsViewModel();
                 userVm.Status = UserStatus.Offline;
             }
 
-            UserMessageViewModel messageVm = message.AsUserMessageViewModel(userVm);
-            messageVm.IsSelf = userVm.Name == this.jabbrContext.Username;
-            
-            this.Messages.Add(messageVm);
-            userVm.IsTyping = false;
+            return userVm;
         }
 
 
