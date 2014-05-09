@@ -14,7 +14,7 @@ namespace NabbR.Client
 {
     [View(Shell.Uri)]
     [ViewModel(typeof(ShellViewModel))]
-    partial class Shell : ModernWindow, IHandle<JoinedRoom>, IHandle<LeftRoom>, IHandle<NavigateToRoom>, IHandle<MessageReceived>, IHandle<DirectMessageReceived>
+    partial class Shell : ModernWindow, IHandle<JoinedRoom>, IHandle<LeftRoom>, IHandle<NavigateToRoom>, IHandle<MessageReceived>, IHandle<DirectMessageReceived>, IHandle<NavigateToView>
     {
         const String Uri = "/";
         private ShellViewModel viewModel;
@@ -116,6 +116,11 @@ namespace NabbR.Client
                 link = new DirectMessageLink { Username = message.From, Source = new Uri(uri, UriKind.RelativeOrAbsolute) };
                 this.directMessageGroup.Links.Add(link);
             }
+        }
+
+        public void Handle(NavigateToView message)
+        {
+            this.ContentSource = new Uri(message.Uri, UriKind.Relative);
         }
     }
 }

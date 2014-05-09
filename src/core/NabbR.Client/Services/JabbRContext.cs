@@ -1,6 +1,5 @@
 ﻿using JabbR.Client;
 using JabbR.Client.Models;
-using JabbR.Models;
 using NabbR.Events;
 using NabbR.ViewModels.Chat;
 using System;
@@ -20,9 +19,11 @@ namespace NabbR.Services
         private readonly IJabbRClient jabbrClient;
         private readonly IEventAggregator eventAggregator;
         private readonly IDependencyResolver dependencyResolver;
-        private readonly SynchronizationContext _synchronizationContext = SynchronizationContext.Current;
-        private readonly ObservableCollection<RoomViewModel> rooms = new ObservableCollection<RoomViewModel>();
-        private readonly ObservableCollection<DirectMessageRoomViewModel> directMessageRooms = new ObservableCollection<DirectMessageRoomViewModel>();
+        private readonly SynchronizationContext synchronizationContext;
+        private readonly ObservableCollection<RoomViewModel> rooms;
+        private readonly ObservableCollection<DirectMessageRoomViewModel> directMessageRooms;
+
+        #region constructor
         /// <summary>
         /// Initializes a new instance of the <see cref="JabbRContext"/> class.
         /// </summary>
@@ -36,6 +37,7 @@ namespace NabbR.Services
         public JabbRContext(IJabbRClient jabbrClient,
                             IEventAggregator eventAggregator,
                             IDependencyResolver dependencyResolver)
+            : this()
         {
             if (jabbrClient == null) throw new ArgumentNullException("jabbrClient");
             if (eventAggregator == null) throw new ArgumentNullException("eventAggregator");
@@ -45,57 +47,40 @@ namespace NabbR.Services
             this.eventAggregator = eventAggregator;
             this.dependencyResolver = dependencyResolver;
         }
+        public JabbRContext()
+        {
+            this.synchronizationContext = SynchronizationContext.Current;
+            this.rooms = new ObservableCollection<RoomViewModel>();
+            this.directMessageRooms = new ObservableCollection<DirectMessageRoomViewModel>();
+        }
+        #endregion
 
-        String IJabbRContext.UserId
+        #region IJabbRContext members
+        public String UserId
         {
             get { return this.userId; }
         }
-        String IJabbRContext.Username
+        public String Username
         {
             get { return this.username; }
         }
-        /// <summary>
-        /// Gets the rooms.
-        /// </summary>
-        /// <value>
-        /// The rooms.
-        /// </value>
-        IEnumerable<RoomViewModel> IJabbRContext.Rooms
+        public Boolean IsLoggedIn
+        {
+            get { return !String.IsNullOrWhiteSpace(this.userId); }
+        }
+        public IEnumerable<RoomViewModel> Rooms
         {
             get { return this.rooms; }
         }
-
-        IEnumerable<DirectMessageRoomViewModel> IJabbRContext.DirectMessageRooms
+        public IEnumerable<DirectMessageRoomViewModel> DirectMessageRooms
         {
             get { return this.directMessageRooms; }
         }
-        /// <summary>
-        /// Logs in the user.
-        /// </summary>
-        /// <param name="username">The username.</param>
-        /// <param name="password">The password.</param>
-        /// <returns></returns>
-        async Task<Boolean> IJabbRContext.LoginAsync(String username, String password)
+        public async Task SetTyping(String roomName)
         {
-            try
-            {
-                this.LogoutUser();
-                LogOnInfo info = await this.jabbrClient.Connect(username, password);
-                await this.LoginUser(info);
-                return true;
-            }
-            catch (Exception)
-            {
-                // todo
-            }
-            return false;
+            await this.jabbrClient.SetTyping(roomName);
         }
-
-        Task IJabbRContext.SetTyping(String roomName)
-        {
-            return this.jabbrClient.SetTyping(roomName);
-        }
-        Task<RoomViewModel> IJabbRContext.JoinRoom(String roomName)
+        public Task<RoomViewModel> JoinRoom(String roomName)
         {
             TaskCompletionSource<RoomViewModel> tcs = new TaskCompletionSource<RoomViewModel>();
 
@@ -119,7 +104,7 @@ namespace NabbR.Services
             this.jabbrClient.JoinRoom(roomName);
             return tcs.Task;
         }
-        Task<IEnumerable<LobbyRoomViewModel>> IJabbRContext.GetLobbyRooms()
+        public Task<IEnumerable<LobbyRoomViewModel>> GetLobbyRooms()
         {
             return this.jabbrClient.GetRooms()
                 .ContinueWith(t =>
@@ -136,29 +121,42 @@ namespace NabbR.Services
                     return rooms.AsEnumerable();
                 });
         }
-        Task<Boolean> IJabbRContext.SendMessage(String message, String roomName)
+        public Task<Boolean> SendMessage(String message, String roomName)
         {
             return this.jabbrClient.Send(message, roomName);
         }
+        /// <summary>
+        /// Logs in the user.
+        /// </summary>
+        /// <param name="username">The username.</param>
+        /// <param name="password">The password.</param>
+        /// <returns></returns>
+        public async Task<Boolean> LoginAsync(String username, String password)
+        {
+            try
+            {
+                this.LogoutUser();
+                LogOnInfo info = await this.jabbrClient.Connect(username, password);
+                await this.LoginUser(info);
+                return true;
+            }
+            catch (Exception)
+            {
+                // todo
+            }
+            return false;
+        }
 
-
-        #region JabbR Events
         private void OnUserActivityChanged(User user)
         {
-            _synchronizationContext.InvokeIfRequired(() =>
+            this.synchronizationContext.InvokeIfRequired(() =>
                 {
-                    foreach (var room in this.rooms)
-                    {
-                        UserViewModel userVm = room.Users.FirstOrDefault(u => u.Name == user.Name);
+                    var status = user.Status;
+                    var users = this.rooms.SelectMany(r => r.Users).Where(u => u.Name == user.Name);
 
-                        if (userVm != null)
-                        {
-                            if (userVm.Status != user.Status)
-                            {
-                                userVm.Status = user.Status;
-                                // room.AddNotification(String.Format("{0} has become {1}.", user.Name, userVm.Status));
-                            }
-                        }
+                    foreach (var userVm in users)
+                    {
+                        userVm.Status = status;
                     }
                 });
         }
@@ -175,7 +173,7 @@ namespace NabbR.Services
         }
         private void OnUserLeftRoom(User user, String roomName)
         {
-            _synchronizationContext.InvokeIfRequired(() =>
+            this.synchronizationContext.InvokeIfRequired(() =>
             {
                 RoomViewModel roomVm = this.rooms.FirstOrDefault(r => r.Name == roomName);
 
@@ -201,7 +199,7 @@ namespace NabbR.Services
         }
         private void OnUserTypingChanged(User user, string roomName)
         {
-            _synchronizationContext.InvokeIfRequired(() =>
+            this.synchronizationContext.InvokeIfRequired(() =>
             {
                 RoomViewModel roomVm = this.rooms.FirstOrDefault(r => r.Name == roomName);
                 if (roomVm != null)
@@ -217,7 +215,7 @@ namespace NabbR.Services
         }
         private void OnMessageReceived(Message message, String roomName)
         {
-            _synchronizationContext.InvokeIfRequired(() =>
+            this.synchronizationContext.InvokeIfRequired(() =>
                 {
                     RoomViewModel room = this.rooms.FirstOrDefault(r => r.Name == roomName);
 
@@ -230,7 +228,7 @@ namespace NabbR.Services
         }
         private void OnUserJoinedRoom(User user, String roomName, Boolean arg3)
         {
-            _synchronizationContext.InvokeIfRequired(() =>
+            this.synchronizationContext.InvokeIfRequired(() =>
             {
                 RoomViewModel roomVm = this.rooms.FirstOrDefault(r => r.Name == roomName);
 
@@ -250,7 +248,7 @@ namespace NabbR.Services
                 this.directMessageRooms.Add(directMessageRoom);
             }
 
-            _synchronizationContext.InvokeIfRequired(() =>
+            this.synchronizationContext.InvokeIfRequired(() =>
             {
                 this.eventAggregator.Publish(new DirectMessageReceived
                 {
@@ -262,11 +260,58 @@ namespace NabbR.Services
         }
         #endregion
 
+        private Task HandleRoomJoined(Room roomInfo)
+        {
+            return this.jabbrClient.GetRoomInfo(roomInfo.Name)
+                .ContinueWith(t =>
+                {
+                    this.synchronizationContext.InvokeIfRequired(() =>
+                        {
+                            var room = t.Result;
+                            var roomViewModel = dependencyResolver.Get<RoomViewModel>();
+
+                            roomViewModel.Name = room.Name;
+                            roomViewModel.Topic = room.Topic;
+                            roomViewModel.Welcome = room.Welcome;
+
+                            foreach (var user in room.Users)
+                            {
+                                this.HandleUserJoiningRoom(roomViewModel, user);
+                            }
+
+                            foreach (var message in room.RecentMessages)
+                            {
+                                roomViewModel.Add(message);
+                            }
+
+                            this.eventAggregator.Publish(new JoinedRoom { Room = roomViewModel });
+                            this.rooms.Add(roomViewModel);
+                        });
+                }, TaskContinuationOptions.OnlyOnRanToCompletion);
+        }
+        private void HandleUserJoiningRoom(RoomViewModel room, User user)
+        {
+            UserViewModel userVm = room.Users.FirstOrDefault(u => u.Name == user.Name);
+            if (userVm == null)
+            {
+                userVm = user.AsViewModel();
+                room.Users.Add(userVm);
+            }
+            else
+            {
+                userVm.Status = user.Status;
+            }
+        }
+        private async Task<UserViewModel> GetUserInfo(String username, CancellationToken token)
+        {
+            var user = await this.jabbrClient.GetUserInfo(username, token);
+            return user.AsViewModel();
+        }
         private async Task<DirectMessageRoomViewModel> InitializeDirectMessageRoom(String from, String to)
         {
             UserViewModel userTo = null;
             UserViewModel userFrom = null;
-            
+
             foreach (var room in this.rooms)
             {
                 foreach (var user in room.Users)
@@ -300,56 +345,6 @@ namespace NabbR.Services
             vm.From = userFrom;
             vm.To = userTo;
             return vm;
-        }
-
-        private async Task<UserViewModel> GetUserInfo(String username, CancellationToken token)
-        {
-            var user = await this.jabbrClient.GetUserInfo(username, token);
-            return user.AsViewModel();
-        }
-
-        private Task HandleRoomJoined(Room roomInfo)
-        {
-            return this.jabbrClient.GetRoomInfo(roomInfo.Name)
-                .ContinueWith(t =>
-                {
-                    _synchronizationContext.InvokeIfRequired(() =>
-                        {
-                            var room = t.Result;
-                            var roomViewModel = dependencyResolver.Get<RoomViewModel>();
-
-                            roomViewModel.Name = room.Name;
-                            roomViewModel.Topic = room.Topic;
-                            roomViewModel.Welcome = room.Welcome;
-
-                            foreach (var user in room.Users)
-                            {
-                                this.HandleUserJoiningRoom(roomViewModel, user);
-                            }
-
-                            foreach (var message in room.RecentMessages)
-                            {
-                                roomViewModel.Add(message);
-                            }
-
-                            this.eventAggregator.Publish(new JoinedRoom { Room = roomViewModel });
-                            this.rooms.Add(roomViewModel);
-                        });
-                }, TaskContinuationOptions.OnlyOnRanToCompletion);
-        }
-
-        private void HandleUserJoiningRoom(RoomViewModel room, User user)
-        {
-            UserViewModel userVm = room.Users.FirstOrDefault(u => u.Name == user.Name);
-            if (userVm == null)
-            {
-                userVm = user.AsViewModel();
-                room.Users.Add(userVm);
-            }
-            else
-            {
-                userVm.Status = user.Status;
-            }
         }
 
         private void LogoutUser()
@@ -396,7 +391,7 @@ namespace NabbR.Services
                 .ContinueWith(t =>
                 {
                     Room roomInfo = t.Result;
-                    _synchronizationContext.InvokeIfRequired(() =>
+                    this.synchronizationContext.InvokeIfRequired(() =>
                         {
                             roomViewModel.Name = roomInfo.Name;
                             roomViewModel.Topic = roomInfo.Topic;
@@ -413,21 +408,6 @@ namespace NabbR.Services
                             }
                         });
                 }, TaskContinuationOptions.OnlyOnRanToCompletion);
-        }
-
-        private void UpdateUserInFoundRooms(String userName, Action<UserViewModel> userUpdateDelegate)
-        {
-            foreach (var room in this.rooms)
-            {
-                foreach (var u in room.Users)
-                {
-                    if (String.Equals(u.Name, userName, StringComparison.OrdinalIgnoreCase))
-                    {
-                        userUpdateDelegate(u);
-                        break;
-                    }
-                }
-            }
         }
     }
 

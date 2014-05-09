@@ -18,6 +18,7 @@ namespace NabbR.Services
         /// Gets the username of the authenticated user.
         /// </summary>
         String Username { get; }
+        Boolean IsLoggedIn { get; }
         /// <summary>
         /// Gets the rooms.
         /// </summary>

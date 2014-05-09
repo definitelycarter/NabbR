@@ -43,6 +43,7 @@
     <Compile Include="Events\MessageReceived.cs" />
     <Compile Include="Events\NavigateToRoom.cs" />
     <Compile Include="Events\DirectMessageReceived.cs" />
+    <Compile Include="Events\NavigateToView.cs" />
     <Compile Include="Events\RoomActivated.cs" />
     <Compile Include="Extensions\JabbRExtensions.cs" />
     <Compile Include="IRoom.cs" />
